@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ГОК "Томинский" — {% block title %}{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+body {
+    background: linear-gradient(135deg, #5c4b3b, #c19a6b, #3e3a36);
+    min-height: 100vh;
+    color: #f5f5f5;
+}
+.topbar {
+    height: 70px;
+    background: #1f1b18;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    border-bottom: 2px solid #c19a6b;
+}
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.logo {
+    height: 45px;
+    width: auto;
+}
+.logo-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: #e0c097;
+}
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+.nav-links a {
+    color: #e0c097;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.2s;
+}
+.nav-links a:hover {
+    color: #c19a6b;
+}
+.badge {
+    background: #c19a6b;
+    color: #1f1b18;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 70px);
+    padding: 20px;
+}
+.container {
+    width: 1200px;
+    padding: 40px;
+    background: rgba(40, 35, 30, 0.95);
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+}
+.content {
+    text-align: left;
+    color: #ddd;
+    line-height: 1.6;
+}
+.content h2 {
+    color: #e0c097;
+    margin-bottom: 20px;
+}
+.content p {
+    margin-bottom: 15px;
+}
+.content ul {
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+.btn-back {
+    display: inline-block;
+    margin-top: 30px;
+    background: #c19a6b;
+    color: #1f1b18;
+    padding: 10px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s;
+}
+.btn-back:hover {
+    background: #e0c097;
+    transform: translateY(-2px);
+}
+footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 12px;
+    color: #aaa;
+}
+</style>
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+<div class="topbar">
+    <div class="logo-area">
+        <img src="/static/gok.png" alt="Логотип" class="logo" onerror="this.style.display='none'">
+        <span class="logo-text">ГОК "Томинский"</span>
+    </div>
+    <div class="nav-links">
+        <a href="/">Главная</a>
+        <a href="/instruction">Инструкция</a>
+        <a href="/company">О компании</a>
+        <a href="/author">Об авторе</a>
+    </div>
+    <div class="badge">Большие вызовы</div>
+</div>
+<div class="wrapper">
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+</div>
+<footer>
+    © 2025 ГОК "Томинский" — Все права защищены
+</footer>
+</body>
+</html>

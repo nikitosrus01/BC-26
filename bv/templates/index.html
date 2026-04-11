@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+{% block title %}Панорама + Анализ{% endblock %}
+{% block extra_css %}
+<style>
+/* Дополнительные стили только для главной страницы */
+.upload-area {
+    border: 2px dashed #c19a6b;
+    padding: 40px 20px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+    background: rgba(255,255,255,0.05);
+    margin-bottom: 20px;
+}
+.upload-area:hover {
+    background: rgba(193,154,107,0.15);
+}
+.upload-area.dragover {
+    background: rgba(193,154,107,0.25);
+    border-color: #e0c097;
+}
+input[type="file"] {
+    display: none;
+}
+.file-info {
+    margin: 15px 0;
+    font-size: 14px;
+    color: #c19a6b;
+    min-height: 24px;
+}
+.file-list {
+    font-size: 12px;
+    color: #aaa;
+    max-height: 100px;
+    overflow-y: auto;
+    text-align: left;
+    margin-top: 10px;
+    background: rgba(0,0,0,0.3);
+    padding: 8px;
+    border-radius: 8px;
+}
+.mode-switch {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px 0;
+    background: rgba(0,0,0,0.3);
+    padding: 12px;
+    border-radius: 40px;
+}
+.mode-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px 20px;
+    border-radius: 30px;
+    transition: 0.2s;
+    background: rgba(255,255,255,0.1);
+}
+.mode-option.selected {
+    background: #c19a6b;
+    color: #1f1b18;
+}
+.mode-option input {
+    display: none;
+}
+button {
+    margin-top: 20px;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 12px;
+    background: #c19a6b;
+    color: #2b2b2b;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+    font-size: 16px;
+}
+button:hover:not(:disabled) {
+    background: #e0c097;
+    transform: scale(1.02);
+}
+button:disabled {
+    background: #5e5a56;
+    color: #aaa;
+    cursor: not-allowed;
+}
+.loader {
+    margin-top: 30px;
+    display: none;
+    font-size: 16px;
+    color: #e0c097;
+    padding: 15px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+}
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #3e3a36;
+    border-radius: 4px;
+    margin: 15px 0;
+    overflow: hidden;
+}
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    background: #c19a6b;
+    transition: width 0.3s;
+}
+.result {
+    margin-top: 30px;
+    text-align: left;
+}
+.result h3 {
+    margin-bottom: 15px;
+    color: #e0c097;
+    text-align: center;
+}
+.result-card {
+    background: rgba(0,0,0,0.3);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.result-card h4 {
+    color: #e0c097;
+    margin-bottom: 10px;
+}
+.result-card img {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #c19a6b;
+    margin-top: 10px;
+}
+.download-link {
+    display: inline-block;
+    margin-top: 15px;
+    background: #c19a6b;
+    color: #1f1b18;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+.download-link:hover {
+    background: #e0c097;
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Создание ортофотоплана + Анализ</h1>
+
+<!-- Переключатель режимов -->
+<div class="mode-switch" id="modeSwitch">
+    <label class="mode-option selected" id="modeCracksLabel">
+        <input type="radio" name="mode" value="cracks" checked> Трещины 
+    </label>
+    <label class="mode-option" id="modeThermalLabel">
+        <input type="radio" name="mode" value="thermal"> Аномальные зоны
+    </label>
+</div>
+
+<div class="upload-area" id="dropzone">
+    📂 Перетащите сюда фото или папку с фотографиями<br>
+    <span style="font-size: 14px; opacity: 0.8;">(JPEG, PNG, TIF, 5–20 кадров)</span>
+    <input type="file" id="fileInput" multiple accept="image/jpeg,image/png,image/tiff,image/jpg">
+</div>
+<div class="file-info" id="fileInfo"></div>
+<div id="fileList" class="file-list"></div>
+
+<button id="uploadBtn" disabled>Запустить обработку</button>
+
+<div class="loader" id="loader">
+    ⏳ Обработка запущена. Это может занять 1–3 минуты...<br>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <span id="progressText">0%</span>
+</div>
+
+<div class="result" id="result" style="display: none;">
+    <h3>✅ Обработка завершена</h3>
+    <div class="result-card">
+        <h4>🗺️ Сшитая панорама</h4>
+        <img id="panoPreview" src="" alt="Панорама">
+        <br>
+        <a id="panoDownload" class="download-link" href="#" download="panorama.jpg">📥 Скачать панораму (JPG)</a>
+    </div>
+    <div class="result-card">
+        <h4 id="resultTitle">🔎 Результат анализа</h4>
+        <img id="analysisPreview" src="" alt="Результат">
+        <br>
+        <a id="analysisDownload" class="download-link" href="#" download="analysis.jpg">📥 Скачать результат (JPG)</a>
+    </div>
+</div>
+
+<script>
+    // Переключение режимов
+    const modeRadios = document.querySelectorAll('input[name="mode"]');
+    const modeCracksLabel = document.getElementById('modeCracksLabel');
+    const modeThermalLabel = document.getElementById('modeThermalLabel');
+    const resultTitle = document.getElementById('resultTitle');
+    function updateModeUI() {
+        const selected = document.querySelector('input[name="mode"]:checked').value;
+        if (selected === 'cracks') {
+            modeCracksLabel.classList.add('selected');
+            modeThermalLabel.classList.remove('selected');
+            resultTitle.innerText = '🔎 Трещины (YOLO)';
+        } else {
+            modeThermalLabel.classList.add('selected');
+            modeCracksLabel.classList.remove('selected');
+            resultTitle.innerText = '🔥 Горячие зоны (тепловизор)';
+        }
+    }
+    modeRadios.forEach(radio => radio.addEventListener('change', updateModeUI));
+    updateModeUI();
+
+    // Drag & drop и отправка
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileListDiv = document.getElementById('fileList');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const loaderDiv = document.getElementById('loader');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const resultDiv = document.getElementById('result');
+    const panoPreview = document.getElementById('panoPreview');
+    const panoDownload = document.getElementById('panoDownload');
+    const analysisPreview = document.getElementById('analysisPreview');
+    const analysisDownload = document.getElementById('analysisDownload');
+
+    let selectedFiles = [];
+
+    function updateFileInfo() {
+        if (selectedFiles.length === 0) {
+            fileInfo.innerText = '';
+            fileListDiv.innerHTML = '';
+            uploadBtn.disabled = true;
+            return;
+        }
+        fileInfo.innerText = `✅ Выбрано файлов: ${selectedFiles.length}`;
+        const names = selectedFiles.slice(0, 5).map(f => f.name).join(', ');
+        fileListDiv.innerHTML = `<strong>Файлы:</strong> ${names}${selectedFiles.length > 5 ? ` и ещё ${selectedFiles.length-5}` : ''}`;
+        uploadBtn.disabled = false;
+    }
+
+    fileInput.addEventListener('change', (e) => {
+        selectedFiles = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+        updateFileInfo();
+    });
+
+    dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+    });
+    dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('dragover');
+    });
+    dropzone.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        const items = e.dataTransfer.items;
+        const files = [];
+        const traverseFileTree = async (entry) => {
+            if (entry.isFile) {
+                return new Promise((resolve) => {
+                    entry.file(file => {
+                        if (file.type.startsWith('image/')) files.push(file);
+                        resolve();
+                    });
+                });
+            } else if (entry.isDirectory) {
+                const reader = entry.createReader();
+                return new Promise((resolve) => {
+                    reader.readEntries(async (entries) => {
+                        for (const ent of entries) {
+                            await traverseFileTree(ent);
+                        }
+                        resolve();
+                    });
+                });
+            }
+        };
+        const entries = [];
+        for (let i = 0; i < items.length; i++) {
+            const entry = items[i].webkitGetAsEntry();
+            if (entry) entries.push(entry);
+        }
+        for (const entry of entries) {
+            await traverseFileTree(entry);
+        }
+        if (files.length > 0) {
+            selectedFiles = files;
+            updateFileInfo();
+            fileInput.value = '';
+        } else {
+            alert('Не найдены изображения в перетащенной папке');
+        }
+    });
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    uploadBtn.addEventListener('click', async () => {
+        if (selectedFiles.length < 2) {
+            alert('Загрузите минимум 2 изображения для сшивки панорамы');
+            return;
+        }
+
+        const mode = document.querySelector('input[name="mode"]:checked').value;
+        const formData = new FormData();
+        selectedFiles.forEach(file => formData.append('images', file));
+        formData.append('mode', mode);
+
+        uploadBtn.disabled = true;
+        loaderDiv.style.display = 'block';
+        resultDiv.style.display = 'none';
+        progressFill.style.width = '0%';
+        progressText.innerText = '0%';
+
+        let fakeProgress = 0;
+        const progressInterval = setInterval(() => {
+            if (fakeProgress < 90) {
+                fakeProgress += Math.random() * 10;
+                if (fakeProgress > 90) fakeProgress = 90;
+                progressFill.style.width = `${fakeProgress}%`;
+                progressText.innerText = `${Math.round(fakeProgress)}%`;
+            }
+        }, 800);
+
+        try {
+            const response = await fetch('/process', {
+                method: 'POST',
+                body: formData
+            });
+            clearInterval(progressInterval);
+            progressFill.style.width = '100%';
+            progressText.innerText = '100%';
+
+            if (!response.ok) {
+                const err = await response.text();
+                throw new Error(`Сервер вернул ошибку: ${response.status} - ${err}`);
+            }
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+
+            panoPreview.src = `data:image/jpeg;base64,${data.panorama}`;
+            panoDownload.href = `data:image/jpeg;base64,${data.panorama}`;
+            analysisPreview.src = `data:image/jpeg;base64,${data.annotated}`;
+            analysisDownload.href = `data:image/jpeg;base64,${data.annotated}`;
+            resultDiv.style.display = 'block';
+            loaderDiv.style.display = 'none';
+        } catch (err) {
+            clearInterval(progressInterval);
+            loaderDiv.style.display = 'none';
+            alert('Ошибка обработки: ' + err.message);
+        } finally {
+            uploadBtn.disabled = false;
+        }
+    });
+</script>
+{% endblock %}

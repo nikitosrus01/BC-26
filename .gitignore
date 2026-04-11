@@ -1,0 +1,16 @@
+*.pt
+*.pth
+*.onnx
+__pycache__/
+*.pyc
+static/uploads/
+temp/
+*.tif
+*.tiff
+*.jpg
+*.jpeg
+*.png
+.venv/
+venv/
+env/
+ENV/
