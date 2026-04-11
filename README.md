@@ -17,14 +17,18 @@
    ```bash
    git clone https://github.com/nikitosrus01/BC-26.git
    cd BC-26/bv   # если проект в папке bv
-2. Создай виртуально окружение
+2. Создай виртуально окружение:
+    ```bash
     python -m venv .venv
     .venv\Scripts\activate   
 3. Устнови библиотеки
+    ```bash
     pip install flask opencv-python ultralytics numpy Pillow
 4. Запусти
+    ```bash
     python app.py
 5. Открой в браузере 
+    ```bash
     http://127.0.0.1:5000
 
 🖼️ Как пользоваться
