@@ -16,7 +16,7 @@
 [![Agisoft Metashape](https://img.shields.io/badge/Metashape-2.2.2-orange.svg)](https://www.agisoft.com/)
 [![Ultralytics YOLO](https://img.shields.io/badge/YOLOv8-yellow.svg)](https://ultralytics.com/)
 
-<img src="\repo/banner.jpeg">
+<img src="bv/repo/banner.jpeg">
 
 </div>
 
