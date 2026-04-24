@@ -7,9 +7,6 @@ static/uploads/
 temp/
 *.tif
 *.tiff
-*.jpg
-*.jpeg
-*.png
 .venv/
 venv/
 env/
