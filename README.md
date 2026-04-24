@@ -110,16 +110,23 @@ graph TD
 ---
 
 ## 📂 Структура проекта
+```
 BC-26/
 ├── app.py # Flask бэкенд + YOLO
+***
 ├── metashape_ortho.py # Фотограмметрия Metashape
+***
 ├── best.pt # Модель трещин
+***
 ├── requirements.txt # Зависимости
+***
 ├── templates/index.html # Веб-интерфейс
+***
 ├── static/ # CSS/JS
+***
 └── test_folder/ # Тестовые фото
+```
 
-text
 
 ## ⚙️ Конфигурация
 
@@ -133,11 +140,13 @@ CONFIDENCE = 0.25                   # Порог детекции
 
 ### metashape_ortho.py
 downscale=2 # Среднее качество
+***
 HighAccuracy # Точное выравнивание
+***
 MildFiltering # Сглаживание шума
+***
 MosaicBlending # Смешивание текстур
 
-text
 
 ## Использование
 
@@ -150,16 +159,18 @@ text
 
 ## API
 POST /upload # ZIP + обработка
+***
 GET /health # Статус системы
 
-text
 
 ## 📈 Результаты
 
 **Вход**: ZIP с 27 фото  
 **Выход**:
 output.jpg # Ортомозаика
+***
 annotated.jpg # + Разметка трещин
+***
 defects.json # Координаты + confidence
 
 
@@ -170,11 +181,13 @@ defects.json # Координаты + confidence
 [nikitosrus01@github](https://github.com/nikitosrus01)  
 Челябинск, 2026
 
+<div align="center">
+
 ## 📄 Лицензия
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-<div align="center">
+
 
 **⭐ Поставьте звезду**  
 **🐛 Баги → Issues**  
