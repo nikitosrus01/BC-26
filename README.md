@@ -11,7 +11,12 @@
 
 <br>
 
-<img src="https://via.placeholder.com/800x400/1e3a8a/ffffff?text=BC-26+Фотограмметрия+%2B+YOLO" alt="BC-26 Banner">
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-2.0+-green.svg)](https://flask.palletsprojects.com/)
+[![Agisoft Metashape](https://img.shields.io/badge/Metashape-2.2.2-orange.svg)](https://www.agisoft.com/)
+[![Ultralytics YOLO](https://img.shields.io/badge/YOLOv8-yellow.svg)](https://ultralytics.com/)
+
+<img src="https://via.placeholder.com/800x400/1e3a8a/ffffff?text=BC-26+%D0%A4%D0%BE%D1%82%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B5%D1%82%D1%80%D0%B8%D1%8F+%2B+YOLO" alt="BC-26 Banner">
 
 </div>
 
@@ -22,31 +27,33 @@
 pip install -r requirements.txt
 
 # 2. Тест фотограмметрии
-mkdir test_folder && echo "тестовые фото" > test_folder/test.jpg
-metashape_ortho.py test_folder output.jpg
+mkdir test_folder
+# Положите 3+ JPG/PNG в test_folder
+"C:\Program Files\Agisoft\Metashape Pro\metashape.exe" -r metashape_ortho.py test_folder output.jpg
+# Ожидаемый: SUCCESS: output.jpg
 
-# 3. Запуск
+# 3. Запуск сервера
 python app.py
 ```
 
 🌐 **http://localhost:5000** — готово!
 
-## ✨ Что делает BC-26
+## ✨ Возможности
 
 | Этап | Инструмент | Результат |
 |------|------------|-----------|
-| 1. Фотограмметрия | Metashape 2.2.2 Pro | Ортомозаика 0.02м/пикс |
-| 2. Детекция | YOLOv8 | Трещины + координаты |
-| 3. Экспорт | JPG + JSON | Готовые данные |
+| **1. Фотограмметрия** | Metashape 2.2.2 Pro | Ортомозаика 0.02м/пикс |
+| **2. Детекция дефектов** | YOLOv8 | Трещины + координаты |
+| **3. Экспорт** | JPG + JSON | Готовые данные |
 
-**Время: 5-45 мин | RAM: 8-20 ГБ**
+**Время: 5-45 мин | ОЗУ: 8-20 ГБ**
 
 ## 📱 Демо
 
 <div align="center">
-<img src="https://via.placeholder.com/800x400/e2e8f0/1e293b?text=Загрузка+ZIP" width="32%">
-<img src="https://via.placeholder.com/800x400/10b981/ffffff?text=Ортомозаика" width="32%">
-<img src="https://via.placeholder.com/800x400/ef4444/ffffff?text=YOLO+Трещины" width="32%">
+<img src="https://via.placeholder.com/800x400/e2e8f0/1e293b?text=%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B0+ZIP" width="32%">
+<img src="https://via.placeholder.com/800x400/10b981/ffffff?text=%D0%9E%D1%80%D1%82%D0%BE%D0%BC%D0%BE%D0%B7%D0%B0%D0%B8%D0%BA%D0%B0" width="32%">
+<img src="https://via.placeholder.com/800x400/ef4444/ffffff?text=YOLO+%D0%A2%D1%80%D0%B5%D1%89%D0%B8%D0%BD%D1%8B" width="32%">
 </div>
 
 ## 🛠 Требования
@@ -54,53 +61,79 @@ python app.py
 | Компонент | Версия | Примечание |
 |-----------|--------|------------|
 | **Metashape** | Pro 2.2.2 | Лицензия обязательна |
-| **Python** | 3.8+ | pip install -r requirements.txt |
-| **YOLO** | v8n | best.pt в корне |
-| **GPU** | Intel Arc+ | CUDA не требуется |
+| **Python** | 3.8+ | `pip install -r requirements.txt` |
+| **YOLO** | v8n | `best.pt` в корне |
+| **GPU** | Intel Arc+ | CUDA необязательно |
 
-## 📂 Структура
+## 📂 Структура проекта
 BC-26/
-├── app.py # Flask + YOLO
-├── metashape_ortho.py # Фотограмметрия
+├── app.py # Flask бэкенд + YOLO
+├── metashape_ortho.py # Фотограмметрия Metashape
 ├── best.pt # Модель трещин
 ├── requirements.txt # Зависимости
-├── templates/index.html # UI
-└── README.md # Вы читаете
+├── templates/index.html # Веб-интерфейс
+├── static/ # CSS/JS
+└── test_folder/ # Тестовые фото
 
 text
 
 ## ⚙️ Конфигурация
 
+### app.py
 ```python
-# app.py
-RESIZE_TO = 4000           # Размер орто
-CONFIDENCE = 0.25          # Порог YOLO
-RESOLUTION = 0.02          # м/пиксель
+MODEL_PATH = "best.pt"              # Путь к YOLO
+RESIZE_TO = 4000                    # Макс размер (пиксели)
+ORTHOPHOTO_RESOLUTION = 0.02        # Разрешение (м/пикс)
+CONFIDENCE = 0.25                   # Порог детекции
 ```
+
+### metashape_ortho.py
+downscale=2 # Среднее качество
+HighAccuracy # Точное выравнивание
+MildFiltering # Сглаживание шума
+MosaicBlending # Смешивание текстур
+
+text
 
 ## 🚀 Производительность
 
 ```mermaid
 graph TD
-    A[10 фото] -->|5 мин| B[8 ГБ RAM]
-    C[27 фото] -->|15 мин| D[12 ГБ RAM] 
-    E[100 фото] -->|45 мин| F[20 ГБ RAM]
+    A[10 фото] -->|5 мин| B[8 ГБ ОЗУ]
+    C[27 фото] -->|15 мин| D[12 ГБ ОЗУ] 
+    E[100 фото] -->|45 мин| F[20 ГБ ОЗУ]
 ```
+
+## Использование
+
+1. **Загрузите ZIP** с фото дрона (до 2 ГБ)
+2. **Дождитесь** обработки (5-45 минут)
+3. **Скачайте**:
+   - `output.jpg` — ортомозаика
+   - `annotated.jpg` — с разметкой трещин
+   - `defects.json` — координаты дефектов
 
 ## 🔧 Частые проблемы
 
 | ❌ Ошибка | ✅ Решение |
 |----------|------------|
-| Folder not found | `mkdir test_folder` + JPG |
-| Metashape license | Pro версия + лицензия |
-| CUDA memory | `RESIZE_TO=2000` |
-| np not defined | `pip install numpy` |
+| `Folder not found` | `mkdir test_folder` + JPG |
+| `License error` | Лицензия Metashape Pro |
+| `CUDA out of memory` | `RESIZE_TO=2000` |
+| `NameError: np` | `pip install numpy` |
+
+## API
+POST /upload # ZIP + обработка
+GET /health # Статус системы
+
+text
 
 ## 📈 Результаты
 
-**Вход**: ZIP с 27 фото → **Выход**:
+**Вход**: ZIP с 27 фото  
+**Выход**:
 output.jpg # Ортомозаика
-annotated.jpg # + разметка трещин
+annotated.jpg # + Разметка трещин
 defects.json # Координаты + confidence
 
 text
@@ -117,8 +150,8 @@ text
 
 <div align="center">
 
-**⭐ Star если помогло**  
-**🐛 Issues для багов**  
-**💬 Discussions для вопросов**
+**⭐ Поставьте звезду**  
+**🐛 Баги → Issues**  
+**💬 Вопросы → Discussions**
 
 </div>
