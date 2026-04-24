@@ -9,7 +9,6 @@
 [![GitHub issues](https://img.shields.io/github/issues/nikitosrus01/BC-26)](https://github.com/nikitosrus01/BC-26/issues)
 [![License](https://img.shields.io/github/license/nikitosrus01/BC-26)](https://github.com/nikitosrus01/BC-26/blob/main/LICENSE)
 
-
 <img src="bv/repo/banner.jpeg">
 
 <br>
@@ -68,6 +67,7 @@ python app.py
 | **GPU** | Intel Arc+ | CUDA необязательно |
 
 ## 📂 Структура проекта
+```
 BC-26/
 ├── app.py # Flask бэкенд + YOLO
 ├── metashape_ortho.py # Фотограмметрия Metashape
@@ -76,8 +76,7 @@ BC-26/
 ├── templates/index.html # Веб-интерфейс
 ├── static/ # CSS/JS
 └── test_folder/ # Тестовые фото
-
-text
+```
 
 ## ⚙️ Конфигурация
 
@@ -90,12 +89,12 @@ CONFIDENCE = 0.25                   # Порог детекции
 ```
 
 ### metashape_ortho.py
+```
 downscale=2 # Среднее качество
 HighAccuracy # Точное выравнивание
 MildFiltering # Сглаживание шума
 MosaicBlending # Смешивание текстур
-
-text
+```
 
 ## 🚀 Производительность
 
