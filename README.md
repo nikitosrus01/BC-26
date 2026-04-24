@@ -16,7 +16,7 @@
 [![Agisoft Metashape](https://img.shields.io/badge/Metashape-2.2.2-orange.svg)](https://www.agisoft.com/)
 [![Ultralytics YOLO](https://img.shields.io/badge/YOLOv8-yellow.svg)](https://ultralytics.com/)
 
-<img src="https://via.placeholder.com/800x400/1e3a8a/ffffff?text=BC-26+%D0%A4%D0%BE%D1%82%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B5%D1%82%D1%80%D0%B8%D1%8F+%2B+YOLO" alt="BC-26 Banner">
+<img src="\repo/banner.jpeg">
 
 </div>
 
