@@ -1,7 +1,7 @@
 <div align="left">
-  <div style="display: flex; justify-content: space-between; align-items: center;">
+  <div style="display: flex; align-items: center;">
     <h1 style="margin: 0;">Большие вызовы 2026</h1>
-    <img src="bv/static/gok.png" width="80" style="vertical-align: middle;">
+    <img src="bv/static/gok.png" width="80" style="margin-left: 20px;">
   </div>
 </div>
 
