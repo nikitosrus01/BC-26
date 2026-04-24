@@ -1,6 +1,8 @@
-<div align="left" style="position: relative;">
-  <h1>Большие вызовы 2026</h1>
-  <img src="bv/static/gok.png" width="80" style="position: absolute; right: 0; top: 0;">
+<div align="left">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="margin: 0;">Большие вызовы 2026</h1>
+    <img src="bv/static/gok.png" width="80" style="vertical-align: middle;">
+  </div>
 </div>
 
 <div align="center">
