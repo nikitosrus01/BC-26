@@ -9,6 +9,9 @@
 [![GitHub issues](https://img.shields.io/github/issues/nikitosrus01/BC-26)](https://github.com/nikitosrus01/BC-26/issues)
 [![License](https://img.shields.io/github/license/nikitosrus01/BC-26)](https://github.com/nikitosrus01/BC-26/blob/main/LICENSE)
 
+
+<img src="bv/repo/banner.jpeg">
+
 <br>
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
@@ -16,7 +19,6 @@
 [![Agisoft Metashape](https://img.shields.io/badge/Metashape-2.2.2-orange.svg)](https://www.agisoft.com/)
 [![Ultralytics YOLO](https://img.shields.io/badge/YOLOv8-yellow.svg)](https://ultralytics.com/)
 
-<img src="bv/repo/banner.jpeg">
 
 </div>
 
