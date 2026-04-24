@@ -13,7 +13,7 @@
     font-family: 'Inter', sans-serif;
 }
 body {
-    background: linear-gradient(135deg, #5c4b3b, #c19a6b, #3e3a36);
+    background: #2b2622;
     min-height: 100vh;
     color: #f5f5f5;
 }
@@ -30,6 +30,8 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
+    text-decoration: none;      /* убираем подчёркивание у ссылки */
+    color: inherit;             /* цвет как у родителя */
 }
 .logo {
     height: 45px;
@@ -57,9 +59,17 @@ body {
     background: #c19a6b;
     color: #1f1b18;
     padding: 5px 12px;
-    border-radius: 20px;
+    border-radius: 4px;
     font-size: 14px;
     font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+.badge:hover {
+    background: #e0c097;
+    transform: translateY(-1px);
 }
 .wrapper {
     display: flex;
@@ -72,9 +82,9 @@ body {
     width: 1200px;
     padding: 40px;
     background: rgba(40, 35, 30, 0.95);
-    border-radius: 20px;
+    border-radius: 6px;
     text-align: center;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
 }
 .content {
     text-align: left;
@@ -98,7 +108,7 @@ body {
     background: #c19a6b;
     color: #1f1b18;
     padding: 10px 20px;
-    border-radius: 30px;
+    border-radius: 4px;
     text-decoration: none;
     font-weight: 600;
     transition: 0.2s;
@@ -118,17 +128,20 @@ footer {
 </head>
 <body>
 <div class="topbar">
-    <div class="logo-area">
+    <!-- Логотип + название стали ссылкой на сайт компании -->
+    <a href="https://tomgok.ru/" target="_blank" rel="noopener noreferrer" class="logo-area">
         <img src="/static/gok.png" alt="Логотип" class="logo" onerror="this.style.display='none'">
         <span class="logo-text">ГОК "Томинский"</span>
-    </div>
+    </a>
     <div class="nav-links">
         <a href="/">Главная</a>
         <a href="/instruction">Инструкция</a>
         <a href="/company">О компании</a>
         <a href="/author">Об авторе</a>
     </div>
-    <div class="badge">Большие вызовы</div>
+    <a href="https://bigchallenges.ru/" target="_blank" rel="noopener noreferrer" class="badge">
+        Большие вызовы
+    </a>
 </div>
 <div class="wrapper">
 <div class="container">
@@ -136,7 +149,7 @@ footer {
 </div>
 </div>
 <footer>
-    © 2026 Большие вызовы
+    &copy; 2026 Большие вызовы
 </footer>
 </body>
 </html>

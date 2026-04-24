@@ -2,11 +2,10 @@
 {% block title %}Панорама + Анализ{% endblock %}
 {% block extra_css %}
 <style>
-/* Дополнительные стили только для главной страницы */
 .upload-area {
     border: 2px dashed #c19a6b;
     padding: 40px 20px;
-    border-radius: 15px;
+    border-radius: 6px;
     cursor: pointer;
     transition: 0.3s;
     background: rgba(255,255,255,0.05);
@@ -37,7 +36,7 @@ input[type="file"] {
     margin-top: 10px;
     background: rgba(0,0,0,0.3);
     padding: 8px;
-    border-radius: 8px;
+    border-radius: 4px;
 }
 .mode-switch {
     display: flex;
@@ -46,7 +45,7 @@ input[type="file"] {
     margin: 20px 0;
     background: rgba(0,0,0,0.3);
     padding: 12px;
-    border-radius: 40px;
+    border-radius: 6px;
 }
 .mode-option {
     display: flex;
@@ -54,7 +53,7 @@ input[type="file"] {
     gap: 8px;
     cursor: pointer;
     padding: 8px 20px;
-    border-radius: 30px;
+    border-radius: 4px;
     transition: 0.2s;
     background: rgba(255,255,255,0.1);
 }
@@ -69,7 +68,7 @@ button {
     margin-top: 20px;
     padding: 15px 30px;
     border: none;
-    border-radius: 12px;
+    border-radius: 4px;
     background: #c19a6b;
     color: #2b2b2b;
     font-weight: 600;
@@ -94,7 +93,8 @@ button:disabled {
     color: #e0c097;
     padding: 15px;
     background: rgba(0,0,0,0.2);
-    border-radius: 10px;
+    border-radius: 6px;
+    text-align: left;
 }
 .progress-bar {
     width: 100%;
@@ -110,6 +110,33 @@ button:disabled {
     background: #c19a6b;
     transition: width 0.3s;
 }
+.toggle-log-btn {
+    background: transparent;
+    border: 1px solid #c19a6b;
+    color: #c19a6b;
+    padding: 6px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 10px 0;
+    width: auto;
+}
+.toggle-log-btn:hover {
+    background: rgba(193,154,107,0.15);
+}
+.log-box {
+    margin-top: 15px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 12px;
+    color: #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+    text-align: left;
+    font-family: monospace;
+    display: none;
+}
 .result {
     margin-top: 30px;
     text-align: left;
@@ -121,7 +148,7 @@ button:disabled {
 }
 .result-card {
     background: rgba(0,0,0,0.3);
-    border-radius: 15px;
+    border-radius: 6px;
     padding: 20px;
     margin-bottom: 20px;
 }
@@ -131,7 +158,7 @@ button:disabled {
 }
 .result-card img {
     width: 100%;
-    border-radius: 10px;
+    border-radius: 4px;
     border: 1px solid #c19a6b;
     margin-top: 10px;
 }
@@ -142,7 +169,7 @@ button:disabled {
     color: #1f1b18;
     text-decoration: none;
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: 4px;
     font-weight: 600;
     transition: 0.2s;
 }
@@ -154,9 +181,8 @@ button:disabled {
 {% endblock %}
 
 {% block content %}
-<h1>Создание ортофотоплана + Анализ</h1>
+<h1>Создание ортофотоплана и анализ</h1>
 
-<!-- Переключатель режимов -->
 <div class="mode-switch" id="modeSwitch">
     <label class="mode-option selected" id="modeCracksLabel">
         <input type="radio" name="mode" value="cracks" checked> Трещины 
@@ -167,8 +193,8 @@ button:disabled {
 </div>
 
 <div class="upload-area" id="dropzone">
-    📂 Перетащите сюда фото или папку с фотографиями<br>
-    <span style="font-size: 14px; opacity: 0.8;">(JPEG, PNG, TIF, 5–20 кадров)</span>
+    Перетащите сюда фото или папку с фотографиями<br>
+    <span style="font-size: 14px; opacity: 0.8;">(JPEG, PNG, TIF)</span>
     <input type="file" id="fileInput" multiple accept="image/jpeg,image/png,image/tiff,image/jpg">
 </div>
 <div class="file-info" id="fileInfo"></div>
@@ -177,29 +203,31 @@ button:disabled {
 <button id="uploadBtn" disabled>Запустить обработку</button>
 
 <div class="loader" id="loader">
-    ⏳ Обработка запущена. Это может занять 1–3 минуты...<br>
+    Обработка запущена. Это может занять несколько минут.
     <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
     <span id="progressText">0%</span>
+    <button class="toggle-log-btn" id="toggleLogBtn">Показать логи</button>
+    <div class="log-box" id="logBox"></div>
 </div>
 
 <div class="result" id="result" style="display: none;">
-    <h3>✅ Обработка завершена</h3>
+    <h3>Обработка завершена</h3>
     <div class="result-card">
-        <h4>🗺️ Сшитая панорама</h4>
+        <h4>Сшитая панорама</h4>
         <img id="panoPreview" src="" alt="Панорама">
         <br>
-        <a id="panoDownload" class="download-link" href="#" download="panorama.jpg">📥 Скачать панораму (JPG)</a>
+        <a id="panoDownload" class="download-link" href="#" download="panorama.jpg">Скачать панораму (JPG)</a>
     </div>
     <div class="result-card">
-        <h4 id="resultTitle">🔎 Результат анализа</h4>
+        <h4 id="resultTitle">Результат анализа</h4>
         <img id="analysisPreview" src="" alt="Результат">
         <br>
-        <a id="analysisDownload" class="download-link" href="#" download="analysis.jpg">📥 Скачать результат (JPG)</a>
+        <a id="analysisDownload" class="download-link" href="#" download="analysis.jpg">Скачать результат (JPG)</a>
     </div>
 </div>
 
 <script>
-    // Переключение режимов
+    // ---- Переключение режимов ----
     const modeRadios = document.querySelectorAll('input[name="mode"]');
     const modeCracksLabel = document.getElementById('modeCracksLabel');
     const modeThermalLabel = document.getElementById('modeThermalLabel');
@@ -209,17 +237,17 @@ button:disabled {
         if (selected === 'cracks') {
             modeCracksLabel.classList.add('selected');
             modeThermalLabel.classList.remove('selected');
-            resultTitle.innerText = '🔎 Трещины (YOLO)';
+            resultTitle.innerText = 'Результат анализа (YOLO / трещины)';
         } else {
             modeThermalLabel.classList.add('selected');
             modeCracksLabel.classList.remove('selected');
-            resultTitle.innerText = '🔥 Горячие зоны (тепловизор)';
+            resultTitle.innerText = 'Результат анализа (тепловизор)';
         }
     }
     modeRadios.forEach(radio => radio.addEventListener('change', updateModeUI));
     updateModeUI();
 
-    // Drag & drop и отправка
+    // ---- Drag & drop и отправка ----
     const dropzone = document.getElementById('dropzone');
     const fileInput = document.getElementById('fileInput');
     const fileInfo = document.getElementById('fileInfo');
@@ -228,6 +256,8 @@ button:disabled {
     const loaderDiv = document.getElementById('loader');
     const progressFill = document.getElementById('progressFill');
     const progressText = document.getElementById('progressText');
+    const logBox = document.getElementById('logBox');
+    const toggleLogBtn = document.getElementById('toggleLogBtn');
     const resultDiv = document.getElementById('result');
     const panoPreview = document.getElementById('panoPreview');
     const panoDownload = document.getElementById('panoDownload');
@@ -243,7 +273,7 @@ button:disabled {
             uploadBtn.disabled = true;
             return;
         }
-        fileInfo.innerText = `✅ Выбрано файлов: ${selectedFiles.length}`;
+        fileInfo.innerText = `Выбрано файлов: ${selectedFiles.length}`;
         const names = selectedFiles.slice(0, 5).map(f => f.name).join(', ');
         fileListDiv.innerHTML = `<strong>Файлы:</strong> ${names}${selectedFiles.length > 5 ? ` и ещё ${selectedFiles.length-5}` : ''}`;
         uploadBtn.disabled = false;
@@ -304,6 +334,18 @@ button:disabled {
     });
     dropzone.addEventListener('click', () => fileInput.click());
 
+    // Кнопка показа/скрытия логов
+    toggleLogBtn.addEventListener('click', () => {
+        if (logBox.style.display === 'block') {
+            logBox.style.display = 'none';
+            toggleLogBtn.textContent = 'Показать логи';
+        } else {
+            logBox.style.display = 'block';
+            toggleLogBtn.textContent = 'Скрыть логи';
+        }
+    });
+
+    // ---- Отправка с SSE ----
     uploadBtn.addEventListener('click', async () => {
         if (selectedFiles.length < 2) {
             alert('Загрузите минимум 2 изображения для сшивки панорамы');
@@ -320,43 +362,77 @@ button:disabled {
         resultDiv.style.display = 'none';
         progressFill.style.width = '0%';
         progressText.innerText = '0%';
-
-        let fakeProgress = 0;
-        const progressInterval = setInterval(() => {
-            if (fakeProgress < 90) {
-                fakeProgress += Math.random() * 10;
-                if (fakeProgress > 90) fakeProgress = 90;
-                progressFill.style.width = `${fakeProgress}%`;
-                progressText.innerText = `${Math.round(fakeProgress)}%`;
-            }
-        }, 800);
+        logBox.innerHTML = '';
+        logBox.style.display = 'none';       // скрываем логи при новом запуске
+        toggleLogBtn.textContent = 'Показать логи';
 
         try {
-            const response = await fetch('/process', {
-                method: 'POST',
-                body: formData
-            });
-            clearInterval(progressInterval);
-            progressFill.style.width = '100%';
-            progressText.innerText = '100%';
-
-            if (!response.ok) {
-                const err = await response.text();
-                throw new Error(`Сервер вернул ошибку: ${response.status} - ${err}`);
+            const resp = await fetch('/process', { method: 'POST', body: formData });
+            if (!resp.ok) {
+                const err = await resp.text();
+                throw new Error(`Сервер вернул ошибку: ${resp.status} - ${err}`);
             }
-            const data = await response.json();
-            if (data.error) throw new Error(data.error);
+            const { job_id, error } = await resp.json();
+            if (error) throw new Error(error);
 
-            panoPreview.src = `data:image/jpeg;base64,${data.panorama}`;
-            panoDownload.href = `data:image/jpeg;base64,${data.panorama}`;
-            analysisPreview.src = `data:image/jpeg;base64,${data.annotated}`;
-            analysisDownload.href = `data:image/jpeg;base64,${data.annotated}`;
-            resultDiv.style.display = 'block';
-            loaderDiv.style.display = 'none';
+            const evtSource = new EventSource(`/stream/${job_id}`);
+
+            evtSource.addEventListener('log', (e) => {
+                const msg = JSON.parse(e.data);
+                const line = document.createElement('div');
+                line.innerText = msg;
+                logBox.appendChild(line);
+                logBox.scrollTop = logBox.scrollHeight;
+            });
+
+            evtSource.addEventListener('progress', (e) => {
+                const { step, total, desc } = JSON.parse(e.data);
+                const percent = Math.round((step / total) * 100);
+                progressFill.style.width = `${percent}%`;
+                progressText.innerText = `${percent}% \u2014 ${desc}`;
+                const line = document.createElement('div');
+                line.innerText = `[${step}/${total}] ${desc}`;
+                logBox.appendChild(line);
+                logBox.scrollTop = logBox.scrollHeight;
+            });
+
+            evtSource.addEventListener('result', (e) => {
+                const { panorama, annotated } = JSON.parse(e.data);
+                panoPreview.src = `data:image/jpeg;base64,${panorama}`;
+                panoDownload.href = `data:image/jpeg;base64,${panorama}`;
+                analysisPreview.src = `data:image/jpeg;base64,${annotated}`;
+                analysisDownload.href = `data:image/jpeg;base64,${annotated}`;
+                resultDiv.style.display = 'block';
+                loaderDiv.style.display = 'none';
+                evtSource.close();
+            });
+
+            evtSource.addEventListener('error', (e) => {
+                const errMsg = JSON.parse(e.data);
+                const line = document.createElement('div');
+                line.style.color = 'red';
+                line.innerText = 'Ошибка: ' + errMsg;
+                logBox.appendChild(line);
+                logBox.scrollTop = logBox.scrollHeight;
+                loaderDiv.style.display = 'none';
+                uploadBtn.disabled = false;
+                evtSource.close();
+            });
+
+            evtSource.onerror = () => {
+                if (evtSource.readyState === EventSource.CLOSED && resultDiv.style.display === 'none') {
+                    const line = document.createElement('div');
+                    line.style.color = 'red';
+                    line.innerText = 'Соединение с сервером потеряно';
+                    logBox.appendChild(line);
+                    loaderDiv.style.display = 'none';
+                    uploadBtn.disabled = false;
+                }
+            };
+
         } catch (err) {
-            clearInterval(progressInterval);
             loaderDiv.style.display = 'none';
-            alert('Ошибка обработки: ' + err.message);
+            alert('Ошибка: ' + err.message);
         } finally {
             uploadBtn.disabled = false;
         }
