@@ -1,6 +1,10 @@
 <div align="left">
-
-# Большие вызовы 2026 <img src="bv/static/gok.png" width="80" style="margin-left: 200px; vertical-align: middle;">
+<table style="width: 100%;">
+<tr>
+<td>Большие вызовы 2026</td>
+<td align="right"><img src="bv/static/gok.png" width="50"></td>
+</tr>
+</table>
 
 <div align="center">
   
