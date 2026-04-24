@@ -1,6 +1,6 @@
 <div align="left">
 
-# Большие вызовы 2026                            <img src="bv/static/gok.jpeg">
+# Большие вызовы 2026                            <img src="bv/static/gok.png">
 
 <div align="center">
   
@@ -113,17 +113,11 @@ graph TD
 ```
 BC-26/
 ├── app.py # Flask бэкенд + YOLO
-***
 ├── metashape_ortho.py # Фотограмметрия Metashape
-***
 ├── best.pt # Модель трещин
-***
 ├── requirements.txt # Зависимости
-***
 ├── templates/index.html # Веб-интерфейс
-***
 ├── static/ # CSS/JS
-***
 └── test_folder/ # Тестовые фото
 ```
 
@@ -140,11 +134,8 @@ CONFIDENCE = 0.25                   # Порог детекции
 
 ### metashape_ortho.py
 downscale=2 # Среднее качество
-***
 HighAccuracy # Точное выравнивание
-***
 MildFiltering # Сглаживание шума
-***
 MosaicBlending # Смешивание текстур
 
 
@@ -159,7 +150,6 @@ MosaicBlending # Смешивание текстур
 
 ## API
 POST /upload # ZIP + обработка
-***
 GET /health # Статус системы
 
 
@@ -168,9 +158,7 @@ GET /health # Статус системы
 **Вход**: ZIP с 27 фото  
 **Выход**:
 output.jpg # Ортомозаика
-***
 annotated.jpg # + Разметка трещин
-***
 defects.json # Координаты + confidence
 
 
