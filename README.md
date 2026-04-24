@@ -9,6 +9,8 @@
 [![GitHub issues](https://img.shields.io/github/issues/nikitosrus01/BC-26)](https://github.com/nikitosrus01/BC-26/issues)
 [![License](https://img.shields.io/github/license/nikitosrus01/BC-26)](https://github.com/nikitosrus01/BC-26/blob/main/LICENSE)
 
+<br>
+
 <img src="bv/repo/banner.jpeg">
 
 <br>
@@ -17,7 +19,6 @@
 [![Flask](https://img.shields.io/badge/Flask-2.0+-green.svg)](https://flask.palletsprojects.com/)
 [![Agisoft Metashape](https://img.shields.io/badge/Metashape-2.2.2-orange.svg)](https://www.agisoft.com/)
 [![Ultralytics YOLO](https://img.shields.io/badge/YOLOv8-yellow.svg)](https://ultralytics.com/)
-
 
 </div>
 
@@ -39,6 +40,10 @@ python app.py
 
 🌐 **http://localhost:5000** — готово!
 
+---
+
+<div align="center">
+
 ## ✨ Возможности
 
 | Этап | Инструмент | Результат |
@@ -49,13 +54,19 @@ python app.py
 
 **Время: 5-45 мин | ОЗУ: 8-20 ГБ**
 
-## 📱 Демо
+</div>
 
 <div align="center">
+
+## 📱 Демо
+
 <img src="https://via.placeholder.com/800x400/e2e8f0/1e293b?text=%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B0+ZIP" width="32%">
 <img src="https://via.placeholder.com/800x400/10b981/ffffff?text=%D0%9E%D1%80%D1%82%D0%BE%D0%BC%D0%BE%D0%B7%D0%B0%D0%B8%D0%BA%D0%B0" width="32%">
 <img src="https://via.placeholder.com/800x400/ef4444/ffffff?text=YOLO+%D0%A2%D1%80%D0%B5%D1%89%D0%B8%D0%BD%D1%8B" width="32%">
+
 </div>
+
+<div align="center">
 
 ## 🛠 Требования
 
@@ -66,8 +77,37 @@ python app.py
 | **YOLO** | v8n | `best.pt` в корне |
 | **GPU** | Intel Arc+ | CUDA необязательно |
 
-## 📂 Структура проекта
+</div>
+
+<div align="center">
+
+## 🚀 Производительность
+
+```mermaid
+graph TD
+    A[10 фото] -->|5 мин| B[8 ГБ ОЗУ]
+    C[27 фото] -->|15 мин| D[12 ГБ ОЗУ] 
+    E[100 фото] -->|45 мин| F[20 ГБ ОЗУ]
 ```
+
+</div>
+
+<div align="center">
+
+## 🔧 Частые проблемы
+
+| ❌ Ошибка | ✅ Решение |
+|----------|------------|
+| `Folder not found` | `mkdir test_folder` + JPG |
+| `License error` | Лицензия Metashape Pro |
+| `CUDA out of memory` | `RESIZE_TO=2000` |
+| `NameError: np` | `pip install numpy` |
+
+</div>
+
+---
+
+## 📂 Структура проекта
 BC-26/
 ├── app.py # Flask бэкенд + YOLO
 ├── metashape_ortho.py # Фотограмметрия Metashape
@@ -76,7 +116,8 @@ BC-26/
 ├── templates/index.html # Веб-интерфейс
 ├── static/ # CSS/JS
 └── test_folder/ # Тестовые фото
-```
+
+text
 
 ## ⚙️ Конфигурация
 
@@ -89,21 +130,12 @@ CONFIDENCE = 0.25                   # Порог детекции
 ```
 
 ### metashape_ortho.py
-```
 downscale=2 # Среднее качество
 HighAccuracy # Точное выравнивание
 MildFiltering # Сглаживание шума
 MosaicBlending # Смешивание текстур
-```
 
-## 🚀 Производительность
-
-```mermaid
-graph TD
-    A[10 фото] -->|5 мин| B[8 ГБ ОЗУ]
-    C[27 фото] -->|15 мин| D[12 ГБ ОЗУ] 
-    E[100 фото] -->|45 мин| F[20 ГБ ОЗУ]
-```
+text
 
 ## Использование
 
@@ -113,15 +145,6 @@ graph TD
    - `output.jpg` — ортомозаика
    - `annotated.jpg` — с разметкой трещин
    - `defects.json` — координаты дефектов
-
-## 🔧 Частые проблемы
-
-| ❌ Ошибка | ✅ Решение |
-|----------|------------|
-| `Folder not found` | `mkdir test_folder` + JPG |
-| `License error` | Лицензия Metashape Pro |
-| `CUDA out of memory` | `RESIZE_TO=2000` |
-| `NameError: np` | `pip install numpy` |
 
 ## API
 POST /upload # ZIP + обработка
