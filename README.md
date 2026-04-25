@@ -47,6 +47,7 @@ mkdir test_folder
 
 # 3. Запуск сервера
 python app.py
+
 🌐 http://localhost:5000 — готово!
 
 <div align="center">
@@ -60,6 +61,7 @@ python app.py
 </div><div align="center">
 📱 Демо
 <img src="https://via.placeholder.com/800x400/e2e8f0/1e293b?text=%D0%97%D0%B0%D0%B3%D1%80%D1%83%D0%B7%D0%BA%D0%B0+ZIP" width="32%"> <img src="https://via.placeholder.com/800x400/10b981/ffffff?text=%D0%9E%D1%80%D1%82%D0%BE%D0%BC%D0%BE%D0%B7%D0%B0%D0%B8%D0%BA%D0%B0" width="32%"> <img src="https://via.placeholder.com/800x400/ef4444/ffffff?text=YOLO+%D0%A2%D1%80%D0%B5%D1%89%D0%B8%D0%BD%D1%8B" width="32%"></div><div align="center">
+
 🛠 Требования
 Компонент	Версия	Примечание
 Metashape	Pro 2.2.2	Лицензия обязательна
@@ -67,6 +69,7 @@ Python	3.8+	pip install -r requirements.txt
 YOLO	v8n	best.pt в корне
 GPU	Intel Arc+	CUDA необязательно
 </div><div align="center">
+
 🚀 Производительность
 graph TD
     A[10 фото] -->|5 мин| B[8 ГБ ОЗУ]
@@ -80,8 +83,8 @@ License error	Лицензия Metashape Pro
 CUDA out of memory	RESIZE_TO=2000
 NameError: np	pip install numpy
 </div>
-📂 Структура проекта
-text
+
+📂 Структура проект
 BC-26/
 ├── app.py                  # Flask бэкенд + YOLO
 ├── metashape_stitch.py     # Фотограмметрия Metashape
@@ -90,6 +93,7 @@ BC-26/
 ├── templates/index.html    # Веб-интерфейс
 ├── static/                 # CSS/JS
 └── test_folder/            # Тестовые фото
+
 ⚙️ Конфигурация
 app.py
 python
