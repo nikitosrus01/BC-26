@@ -134,20 +134,22 @@ CONFIDENCE = 0.25                   # Порог детекции
 ```
 
 ### metashape_ortho.py
+```
 downscale=2 # Среднее качество
 HighAccuracy # Точное выравнивание
 MildFiltering # Сглаживание шума
 MosaicBlending # Смешивание текстур
+```
 
 
 ## Использование
 
-1. **Загрузите ZIP** с фото дрона (до 2 ГБ)
+1. **Загрузите ZIP** фото c дрона (до 2 ГБ)
 2. **Дождитесь** обработки (5-45 минут)
 3. **Скачайте**:
-   - `output.jpg` — ортомозаика
-   - `annotated.jpg` — с разметкой трещин
-   - `defects.json` — координаты дефектов
+   - `panorama.jpg` — ортомозаика
+   - `analysis.jpg` — с разметкой трещин
+   - `orthophoto_model.obj` — 3D модель
 
 ## API
 POST /upload # ZIP + обработка
@@ -158,9 +160,9 @@ GET /health # Статус системы
 
 **Вход**: ZIP с 27 фото  
 **Выход**:
-output.jpg # Ортомозаика
-annotated.jpg # + Разметка трещин
-defects.json # Координаты + confidence
+panorama.jpg # Ортомозаика
+analysis.jpg # + Разметка трещин
+orthophoto_model.obj # 3D модель
 
 
 
