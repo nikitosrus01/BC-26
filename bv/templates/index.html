@@ -224,6 +224,8 @@ button:disabled {
         <br>
         <a id="analysisDownload" class="download-link" href="#" download="analysis.jpg">Скачать результат (JPG)</a>
     </div>
+    <!-- Контейнер для дополнительных кнопок (3D модель) -->
+    <div id="resultCards"></div>
 </div>
 
 <script>
@@ -259,6 +261,7 @@ button:disabled {
     const logBox = document.getElementById('logBox');
     const toggleLogBtn = document.getElementById('toggleLogBtn');
     const resultDiv = document.getElementById('result');
+    const resultCards = document.getElementById('resultCards');
     const panoPreview = document.getElementById('panoPreview');
     const panoDownload = document.getElementById('panoDownload');
     const analysisPreview = document.getElementById('analysisPreview');
@@ -360,10 +363,12 @@ button:disabled {
         uploadBtn.disabled = true;
         loaderDiv.style.display = 'block';
         resultDiv.style.display = 'none';
+        // Очистка предыдущих кнопок (например, 3D модели)
+        resultCards.innerHTML = '';
         progressFill.style.width = '0%';
         progressText.innerText = '0%';
         logBox.innerHTML = '';
-        logBox.style.display = 'none';       // скрываем логи при новом запуске
+        logBox.style.display = 'none';
         toggleLogBtn.textContent = 'Показать логи';
 
         try {
@@ -397,11 +402,22 @@ button:disabled {
             });
 
             evtSource.addEventListener('result', (e) => {
-                const { panorama, annotated } = JSON.parse(e.data);
+                const { panorama, annotated, model, model_name } = JSON.parse(e.data);
                 panoPreview.src = `data:image/jpeg;base64,${panorama}`;
                 panoDownload.href = `data:image/jpeg;base64,${panorama}`;
                 analysisPreview.src = `data:image/jpeg;base64,${annotated}`;
                 analysisDownload.href = `data:image/jpeg;base64,${annotated}`;
+
+                // Добавляем кнопку для 3D модели, если она пришла
+                if (model) {
+                    const modelLink = document.createElement('a');
+                    modelLink.href = `data:application/octet-stream;base64,${model}`;
+                    modelLink.download = model_name || 'model.obj';
+                    modelLink.textContent = 'Скачать 3D модель (OBJ)';
+                    modelLink.className = 'download-link';
+                    resultCards.appendChild(modelLink);
+                }
+
                 resultDiv.style.display = 'block';
                 loaderDiv.style.display = 'none';
                 evtSource.close();

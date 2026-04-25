@@ -66,6 +66,7 @@ def send_event(job_id, event_type, data):
 # ОСНОВНАЯ ЛОГИКА (поток)
 # ------------------------------------------------------------
 def process_images_thread(job_id, file_data, mode):
+    model_path = None   # путь к экспортированной 3D-модели
     try:
         print(f"=== Старт задачи {job_id[:8]} ===")
         send_event(job_id, 'log', 'Начало обработки')
@@ -116,6 +117,7 @@ def process_images_thread(job_id, file_data, mode):
                 cwd=tmpdir
             )
 
+            # Читаем вывод и ищем путь к модели
             for line in process.stdout:
                 line = line.strip()
                 if line:
@@ -125,6 +127,12 @@ def process_images_thread(job_id, file_data, mode):
                         send_event(job_id, 'progress', {'step': 1, 'total': 4, 'desc': 'Выравнивание...'})
                     elif "2/4 Building" in line:
                         send_event(job_id, 'progress', {'step': 2, 'total': 4, 'desc': 'Построение глубины и модели...'})
+                    elif "EXPORT_MODEL_START" in line:
+                        send_event(job_id, 'log', 'Экспорт 3D модели...')
+                    elif "EXPORT_MODEL:" in line:
+                        model_path = line.split(":", 1)[1].strip()
+                        print(f"DEBUG: 3D модель экспортирована: {model_path}")
+                        send_event(job_id, 'log', f'3D модель экспортирована: {os.path.basename(model_path)}')
                     elif "3/4 Orthomosaic..." in line:
                         send_event(job_id, 'progress', {'step': 3, 'total': 4, 'desc': 'Ортомозаика...'})
                     elif "4/4 Exporting..." in line:
@@ -140,6 +148,7 @@ def process_images_thread(job_id, file_data, mode):
             send_event(job_id, 'log', '✅ Metashape успешно завершён')
             send_event(job_id, 'progress', {'step': 5, 'total': 5, 'desc': 'YOLO анализ'})
 
+            # --- Чтение ортофото и анализ ---
             pano = cv2.imread(ortho_jpg)
             if pano is None:
                 send_event(job_id, 'error', 'Не удалось загрузить ортофотоплан')
@@ -161,6 +170,19 @@ def process_images_thread(job_id, file_data, mode):
             pano_b64 = encode_image_to_base64(pano)
             annotated_b64 = encode_image_to_base64(annotated)
             result = {'panorama': pano_b64, 'annotated': annotated_b64}
+
+            # --- 3D модель (если есть) ---
+            if model_path and os.path.exists(model_path):
+                try:
+                    with open(model_path, "rb") as f:
+                        model_data = f.read()
+                    model_b64 = base64.b64encode(model_data).decode('utf-8')
+                    result['model'] = model_b64
+                    result['model_name'] = os.path.basename(model_path)
+                    send_event(job_id, 'log', '3D модель добавлена в результат')
+                except Exception as e:
+                    print(f"Ошибка при добавлении модели: {e}")
+
             send_event(job_id, 'result', result)
             send_event(job_id, 'log', 'Обработка завершена')
             print(f"=== Задача {job_id[:8]} успешно завершена ===")

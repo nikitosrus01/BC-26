@@ -62,6 +62,12 @@ def main():
         chunk.buildDepthMaps(downscale=2)   # MediumQuality
         chunk.buildModel()                  # Arbitrary surface, из Depth Maps
 
+        # Экспорт 3D модели в OBJ
+        print("EXPORT_MODEL_START")
+        model_path = output_jpg.replace('.jpg', '_model.obj')
+        chunk.exportModel(model_path, format=Metashape.ModelFormatOBJ)
+        print("EXPORT_MODEL:" + model_path)
+
         # 3. Ортомозаика
         print("3/4 Orthomosaic...")
         chunk.buildOrthomosaic(resolution=0.02)
@@ -69,7 +75,7 @@ def main():
         # Перед экспортом снова получаем актуальный chunk
         chunk = doc.chunk
 
-        # 4. Экспорт
+        # 4. Экспорт ортофото
         print("4/4 Exporting...")
         chunk.exportRaster(output_jpg)
 
