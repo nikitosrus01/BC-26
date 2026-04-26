@@ -1,159 +1,175 @@
-<div align="center">
+<div align="left">
 
-# 🏔️ Большие вызовы 2026
-**v2.2** • Обновлено **26.03.2026**  
-*🔥 Скачивание OBJ 3D-моделей из веб-сервиса*
-
+# Большие вызовы 2026
 <img src="bv/static/gok.png" width="80">
 
-[![Stars](https://img.shields.io/github/stars/nikitosrus01/BC-26?style=social)](https://github.com/nikitosrus01/BC-26)
-[![Forks](https://img.shields.io/github/forks/nikitosrus01/BC-26?style=social)](https://github.com/nikitosrus01/BC-26)
-[![Issues](https://img.shields.io/github/issues/nikitosrus01/BC-26)](https://github.com/nikitosrus01/BC-26/issues)
+<div>
+
+<div align="centre">
+
+**v2.2** • Обновлено **26.03.2026**  
+*Новая фича: скачивание 3D-модели в формате OBJ прямо из веб-сервиса!*
+
+[![GitHub stars](https://img.shields.io/github/stars/nikitosrus01/BC-26?style=social)](https://github.com/nikitosrus01/BC-26)
+[![GitHub forks](https://img.shields.io/github/forks/nikitosrus01/BC-26?style=social)](https://github.com/nikitosrus01/BC-26)
+[![GitHub issues](https://img.shields.io/github/issues/nikitosrus01/BC-26)](https://github.com/nikitosrus01/BC-26/issues)
 [![License](https://img.shields.io/github/license/nikitosrus01/BC-26)](https://github.com/nikitosrus01/BC-26/blob/main/LICENSE)
 
 <br>
 
-<img src="bv/repo/banner.jpeg" alt="Баннер проекта">
+<img src="bv/repo/banner.jpeg">
 
 <br>
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-2.0+-green.svg)](https://flask.palletsprojects.com/)
-[![Metashape](https://img.shields.io/badge/Metashape-2.2.2-orange.svg)](https://www.agisoft.com/)
-[![YOLOv8](https://img.shields.io/badge/YOLOv8-yellow.svg)](https://ultralytics.com/)
+[![Agisoft Metashape](https://img.shields.io/badge/Metashape-2.2.2-orange.svg)](https://www.agisoft.com/)
+[![Ultralytics YOLO](https://img.shields.io/badge/YOLOv8-yellow.svg)](https://ultralytics.com/)
 
 </div>
 
-## 📋 Что нового в v2.2 (26.03.2026)
+## 📋 Что нового в **v2.2** (26.03.2026)
 
-<div align="center">
+<div align="left">
 
-**🚀 Скачивание OBJ 3D-моделей прямо из браузера!**
+> ✨ **🚀 Скачивание OBJ 3D-моделей** — полный пайплайн в один клик!
+<div>
 
-**1. Результат работы — 3D модель карьера**  
-<img src="repo/image1.png" alt="3D OBJ модель карьера" width="500">
+<div align="centre">
+**1. Результат: готовая 3D-модель карьера**  
+<img src="repo/image1.png" alt="3D OBJ модель карьера из v2.2" width="500">
 
-**2. Кнопка Download в веб-интерфейсе**  
-<img src="repo/image.png" alt="Кнопка OBJ download" width="400">
-
-🔧 Стабильность + мобильная адаптация
+**2. Веб-интерфейс: кнопка Download OBJ**  
+<img src="repo/image.png" alt="Кнопка скачивания OBJ в веб v2.2" width="400">
 
 </div>
 
-## 📸 О проекте
+## О проекте
 
-**Автоматизированный мониторинг карьеров: фотограмметрия → YOLO трещины → OBJ 3D.**
+**Автоматизированный мониторинг карьеров: от фотограмметрии до поиска трещин с помощью нейросетей.**
 
-Для конкурса «Большие вызовы 2026». Интерес **АО «Томинский ГОК»** — лидер добычи меди РФ.[web:1]
+Данный проект разработан в рамках международного конкурса «Большие вызовы» (2026) и вызвал практический интерес у **АО «Томинский горно-обогатительный комбинат»** (ГОК «Томинский») — одного из крупнейших производителей медного концентрата в России, ведущего открытую добычу руды.
 
-## ✨ Возможности
+Это решение автоматизирует процесс геотехнического мониторинга: от создания ортофотоплана до детекции трещин, разломов и тепловых аномалий, значительно повышая безопасность и эффективность маркшейдерских работ.
 
-- **📐 Фотограмметрия** — Agisoft Metashape Pro
-- **🧠 Детекция трещин** — YOLOv8 `best.pt`
-- **🌐 Веб-сервис** — Flask + OBJ download ✨
-- **💾 Экспорт** — JPG/PNG/OBJ
+## ✨ Основные возможности
 
-## 🎥 Демо веб-сервиса
+- **Фотограмметрия:** Автоматическое построение детальной ортомозаики на основе аэрофотосъемки с помощью Agisoft Metashape Pro.
+- **Нейросетевой анализ:** Обнаружение и локализация дефектов (трещин) на ортофотоплане с помощью модели YOLOv8.
+- **Веб-интерфейс:** Удобная онлайн-платформа для загрузки данных, запуска обработки и визуализации результатов (веб-сервис на Flask).
+- **Экспорт данных:** Сохранение результатов в удобных форматах (`JPG` для ортофотоплана и размеченных изображений, `OBJ` для 3D-модели).
+
+
+## 🎥 Работа веб-сервиса
 
 <div align="center">
 
-**Снимки → ортофотоплан → трещины → OBJ download**
+**Полный пайплайн: снимки → ортофотоплан → детекция трещин → результат**
 
+<!-- Загрузи demo.gif или demo.mp4 в static/ -->
+<!-- Или видео: -->
 <video width="800" controls loop>
   <source src="repo/demo.mp4" type="video/mp4">
-  Ваш браузер не поддерживает видео.
-</video>
+</video> -->
 
-*Реальные данные Томинского ГОК*
+**Пример результата на реальных данных Томинского ГОК.**
 
 </div>
 
-[image:24]
+## 🧠 Технологический стек
 
-## 🧠 Технологии
+| Компонент          | Инструмент              | Версия  | Примечание                          |
+|--------------------|-------------------------|---------|-------------------------------------|
+| **Бэкенд**        | Python, Flask           | 3.8+   | Логика обработки, REST API и веб-сервер |
+| **Фотограмметрия**| Agisoft Metashape Pro   | 2.2.2  | Требуется действующая лицензия [web:3] |
+| **Нейросеть**     | YOLO (Ultralytics)      | v8     | Модель `best.pt` для детекции трещин |
+| **Фронтенд**      | HTML, CSS, JS           | -      | Интерфейс для загрузки и отображения |
+| **Формат данных** | JPG, PNG, OBJ           | -      | Входные снимки и экспорт            |
 
-| Компонент | Инструмент | Версия |
-|-----------|------------|--------|
-| Backend | Python/Flask | 3.8+ |
-| Фото | Metashape Pro | 2.2.2 |
-| AI | YOLOv8 | v8 |
+## 🚀 Быстрый старт (2 минуты)
 
-## 🚀 Быстрый старт
+1. **Клонируйте репозиторий и установите зависимости:**
+   ```bash
+   git clone https://github.com/nikitosrus01/BC-26
+   cd BC-26
+   pip install -r requirements.txt
+   ```
 
-1. **Клонировать + зависимости:**
-```bash
-git clone https://github.com/nikitosrus01/BC-26
-cd BC-26
-pip install -r requirements.txt
-```
+2. **Проверка работы фотограмметрии:**
+   ```bash
+   mkdir test_folder  # Создайте папку
+   # Поместите в неё 3+ JPG или PNG
+   "C:\Program Files\Agisoft\Metashape Pro\metashape.exe" -r metashape_stitch.py test_folder output.jpg
+   # Ожидаемый результат: SUCCESS: output.jpg
+   ```
 
-2. **Тест фотограмметрии:**
-```bash
-mkdir test_folder
-# Добавь 3+ JPG/PNG
-"C:\Program Files\Agisoft\Metashape Pro\metashape.exe" -r metashape_stitch.py test_folder output.jpg
-```
+3. **Запуск веб-сервера (Flask):**
+   ```bash
+   python app.py
+   ```
+   Откройте адрес http://localhost:5000 в браузере, и вы готовы к загрузке данных.
 
-3. **Запуск:**
-```bash
-python app.py
-```
-→ **http://localhost:5000**
+## ⚙️ Конфигурация
 
-## ⚙️ Конфигурация `app.py`
+Файл `app.py` содержит ключевые параметры для тонкой настройки обработки:
 
 ```python
-MODEL_PATH = "best.pt"
-RESIZE_TO = 4000
-ORTHOPHOTO_RESOLUTION = 0.02
-CONFIDENCE = 0.25
-# v2.2:
-OBJ_EXPORT = True
+MODEL_PATH = "best.pt"                 # Путь к весам YOLO модели
+RESIZE_TO = 4000                       # Максимальный размер изображения (пиксели)
+ORTHOPHOTO_RESOLUTION = 0.02           # Разрешение ортомозаики (м/пикс)
+CONFIDENCE = 0.25                      # Порог уверенности для детекции
 ```
 
-## 📊 Производительность
+Настройки склейки в `metashape_stitch.py` позволяют регулировать качество и скорость обработки (downscale, HighAccuracy, MildFiltering, MosaicBlending).[web:13]
 
-| Снимков | Время | RAM |
-|---------|-------|-----|
-| 10 | ~5 мин | 8 ГБ |
-| 27 | ~15 мин | 12 ГБ |
-| 100 | ~45 мин | 20 ГБ |
+## 💻 Системные требования и производительность
 
-## 🗂️ Структура
+| Количество снимков | Примерное время | Оперативная память (RAM) |
+|--------------------|-----------------|------------------------|
+| 10                 | ~5 мин          | ~8 ГБ                  |
+| 27                 | ~15 мин         | ~12 ГБ                 |
+| 100                | ~45 мин         | ~20 ГБ                 |
+
+Примечание: Производительность может варьироваться в зависимости от характеристик процессора / GPU (наличие Intel Arc или CUDA ускоряет YOLO).
+
+## 🗂️ Структура проекта
+```BC-26/
+├── app.py # Основной бэкенд: Flask-сервер, YOLO логика
+├── metashape_stitch.py # Скрипт фотограмметрии для Agisoft Metashape
+├── best.pt # Обученная модель YOLOv8 для детекции трещин
+├── requirements.txt # Список Python-зависимостей
+├── templates/
+│ └── index.html # Веб-интерфейс пользователя
+├── static/ # Директория со статикой (CSS, JS)
+└── test_folder/ # Тестовая директория для снимков
 ```
-BC-26/
-├── app.py # Flask + OBJ v2.2
-├── metashape_stitch.py
-├── best.pt
-├── repo/ # Твои файлы здесь!
-│ ├── image1.png # 3D модель
-│ ├── image.png # Кнопка
-│ └── demo.mp4 # Видео
-└── ...
-```
 
+## 🎯 Потенциальные заказчики и применимость
 
-## 🐛 Troubleshooting
+Ваш проект ориентирован на крупнейшие частные горнодобывающие корпорации РФ. Потенциальными заказчиками являются:
 
-| Ошибка | Решение |
-|--------|---------|
-| Folder not found | `mkdir test_folder` |
-| License error | Активируй Metashape Pro |
-| CUDA OOM | `RESIZE_TO=2000` |
-| No NumPy | `pip install numpy` |
+- Частные корпорации: Металлоинвест, РМК (ГОК «Томинский»), УГМК, ЕвроХим, Nordgold.
+- Публичные корпорации: СУЭК, ФосАгро, Селигдар.
 
-## 🎯 Заказчики
+Все эти компании эксплуатируют глубокие открытые карьеры с высокими требованиями к промышленной безопасности и остро нуждаются в автоматизации мониторинга состояния бортов.
 
-**Частные:** РМК (Томинский), Металлоинвест, УГМК  
-**Публичные:** СУЭК, ФосАгро, Селигдар
+## 🐛 Устранение неполадок
 
-## 📜 MIT License
+| Ошибка                | Вероятная причина              | Решение                              |
+|-----------------------|--------------------------------|--------------------------------------|
+| Folder not found      | Отсутствует папка со снимками  | Создайте целевую папку через `mkdir` |
+| License error         | Нет или истекла лицензия Metashape | Активируйте лицензию Agisoft Metashape Pro |
+| CUDA out of memory    | Недостаточно видеопамяти на GPU| Уменьшите значение `RESIZE_TO` в `app.py` (например, до 2000) |
+| NameError: np         | Отсутствует библиотека NumPy   | Установите: `pip install numpy`      |
 
-## 👤 Никита Голубицкий
-[GitHub](https://github.com/nikitosrus01) | Челябинск, 2026
+## 📜 Лицензия
 
-⭐ **Звездуй!** 🐛 Issues | 💬 Discussions
+Этот проект распространяется под лицензией MIT. Это означает, что вы можете свободно его использовать, модифицировать и распространять при условии сохранения информации об авторе.
 
-<div align="center">
-<img src="https://img.shields.io/badge/внедрение-ГОК-brightgreen">
-</div>
+## 👤 Автор
+
+Никита Голубицкий  
+GitHub: [nikitosrus01](https://github.com/nikitosrus01)  
+Город: Челябинск, 2026
+
+Если этот проект был вам полезен, поставьте, пожалуйста, ⭐ звезду на GitHub. Это поможет привлечь больше внимания к разработке и её промышленному внедрению. Баги отправляйте в Issues, вопросы для обсуждения — в Discussions.
