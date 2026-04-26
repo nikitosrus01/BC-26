@@ -1,9 +1,9 @@
-<div align="center">
+<div align="left">
 
 # Большие вызовы 2026
+<img src="bv/static/gok.png" width="80">
 **v2.2** • Обновлено **26.03.2026**  
 *Новая фича: скачивание 3D-модели в формате OBJ прямо из веб-сервиса!*
-<img src="bv/static/gok.png" width="80">
 
 [![GitHub stars](https://img.shields.io/github/stars/nikitosrus01/BC-26?style=social)](https://github.com/nikitosrus01/BC-26)
 [![GitHub forks](https://img.shields.io/github/forks/nikitosrus01/BC-26?style=social)](https://github.com/nikitosrus01/BC-26)
