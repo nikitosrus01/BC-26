@@ -1,8 +1,9 @@
 <div align="left">
 
-  <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-    <h1 style="margin: 0;">Большие вызовы 2026 <img src="bv/static/gok.png" width="120" style="float: right;"></h1>
-  </div>
+<h1 style="display: flex; justify-content: space-between; align-items: center;">
+   Большие вызовы 2026
+  <img src="bv/static/gok.png" width="120" alt="ГОК">
+</h1>
 
 </div>
 
