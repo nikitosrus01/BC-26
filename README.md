@@ -1,6 +1,6 @@
 <div align="left">
 
-# Большие вызовы 2026 <img src="bv/static/gok.png" width="80">
+# Большие вызовы 2026 <img src="bv/static/gok.png" width="120">
 
 <div>
 
