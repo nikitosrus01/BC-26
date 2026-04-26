@@ -59,14 +59,14 @@
     pip install -r requirements.txt
 Проверка работы фотограмметрии:
 
-bash
+```bash
 mkdir test_folder         # Создайте папку
 # Поместите в неё 3+ JPG или PNG
 "C:\Program Files\Agisoft\Metashape Pro\metashape.exe" -r metashape_stitch.py test_folder output.jpg
 # Ожидаемый результат: SUCCESS: output.jpg
 Запуск веб-сервера (Flask):
 
-bash
+```bash
 python app.py
 Откройте адрес http://localhost:5000 в браузере, и вы готовы к загрузке данных.
 
