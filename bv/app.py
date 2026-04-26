@@ -16,9 +16,7 @@ from ultralytics import YOLO
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 2000 * 1024 * 1024   # 2 ГБ
 
-# ------------------------------------------------------------
-# НАСТРОЙКИ
-# ------------------------------------------------------------
+# Путь к модели и api
 MODEL_PATH = "C:/Users/user/Documents/GitHub/BC-2026/bv/best.pt"
 METASHAPE_EXE = r"C:\Program Files\Agisoft\Metashape Pro\metashape.exe"
 SCRIPT_METASHAPE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "metashape_stitch.py")
@@ -33,15 +31,11 @@ print("⏳ Загрузка YOLO...")
 model = YOLO(MODEL_PATH)
 print("✅ YOLO загружен")
 
-# ------------------------------------------------------------
-# ХРАНИЛИЩЕ ЗАДАЧ
-# ------------------------------------------------------------
+# Хранение задач
 jobs = {}
 jobs_lock = threading.Lock()
 
-# ------------------------------------------------------------
-# ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-# ------------------------------------------------------------
+#Вспомогательные функции
 def encode_image_to_base64(img_bgr, quality=98):
     _, buffer = cv2.imencode('.jpg', img_bgr, [cv2.IMWRITE_JPEG_QUALITY, quality])
     return base64.b64encode(buffer).decode('utf-8')
@@ -62,9 +56,7 @@ def send_event(job_id, event_type, data):
         if job:
             job['queue'].put({'type': event_type, 'data': data})
 
-# ------------------------------------------------------------
-# ОСНОВНАЯ ЛОГИКА (поток)
-# ------------------------------------------------------------
+# Основная логика
 def process_images_thread(job_id, file_data, mode):
     model_path = None   # путь к экспортированной 3D-модели
     try:
