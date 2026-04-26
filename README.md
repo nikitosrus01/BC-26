@@ -5,7 +5,7 @@
 
 <div>
 
-<div align="centre">
+<div align="center">
 
 **v2.2** • Обновлено **26.03.2026**  
 *Новая фича: скачивание 3D-модели в формате OBJ прямо из веб-сервиса!*
@@ -36,7 +36,7 @@
 
 <div>
 
-<div align="centre">
+<div align="center">
 
 **1. Результат: готовая 3D-модель карьера**  
 <img src="repo/image1.png" alt="3D OBJ модель карьера из v2.2" width="500">
