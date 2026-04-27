@@ -1,11 +1,9 @@
 <div align="left">
 
-<h1 style="display: flex; justify-content: space-between; align-items: center;">
-   Большие вызовы 2026
-  <img src="bv/static/gok.png" width="120" alt="ГОК">
-</h1>
+# Большие вызовы 2026 
+<img src="bv/static/gok.png" width="120">
 
-</div>
+<div>
 
 <div align="center">
 
@@ -41,10 +39,10 @@
 <div align="center">
 
 **1. Результат: готовая 3D-модель карьера**  
-<img src="repo/image1.png" alt="3D OBJ модель карьера из v2.2" width="500">
+<img src="bv/repo/image1.png)" alt="3D OBJ модель карьера из v2.2" width="500">
 
 **2. Веб-интерфейс: кнопка Download OBJ**  
-<img src="repo/image.png" alt="Кнопка скачивания OBJ в веб v2.2" width="400">
+<img src="bv/repo/image.png" alt="Кнопка скачивания OBJ в веб v2.2" width="400">
 
 </div>
 
@@ -73,7 +71,7 @@
 <!-- Загрузи demo.gif или demo.mp4 в static/ -->
 <!-- Или видео: -->
 <video width="800" controls loop>
-  <source src="repo/demo.mp4" type="video/mp4">
+  <source src="bv/repo/demo.mp4" type="video/mp4">
 </video> -->
 
 **Пример результата на реальных данных Томинского ГОК.**
