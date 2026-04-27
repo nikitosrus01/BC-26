@@ -39,7 +39,7 @@
 <div align="center">
 
 **1. Результат: готовая 3D-модель карьера**  
-<img src="bv/repo/image1.png)" alt="3D OBJ модель карьера из v2.2" width="500">
+<img src="bv/repo/image1.png" alt="3D OBJ модель карьера из v2.2" width="500">
 
 **2. Веб-интерфейс: кнопка Download OBJ**  
 <img src="bv/repo/image.png" alt="Кнопка скачивания OBJ в веб v2.2" width="400">
