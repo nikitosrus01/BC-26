@@ -62,7 +62,7 @@ def main():
         chunk.buildDepthMaps(downscale=2)   # MediumQuality
         chunk.buildModel()                  # Arbitrary surface, из Depth Maps
 
-        # Экспорт 3D модели в OBJ
+        # Экспорт в OBJ
         print("EXPORT_MODEL_START")
         model_path = output_jpg.replace('.jpg', '_model.obj')
         chunk.exportModel(model_path, format=Metashape.ModelFormatOBJ)

@@ -212,19 +212,18 @@ button:disabled {
 
 <div class="result" id="result" style="display: none;">
     <h3>Обработка завершена</h3>
-    <div class="result-card">
+    <div id="panoCard" class="result-card">
         <h4>Сшитая панорама</h4>
         <img id="panoPreview" src="" alt="Панорама">
         <br>
         <a id="panoDownload" class="download-link" href="#" download="panorama.jpg">Скачать панораму (JPG)</a>
     </div>
-    <div class="result-card">
+    <div id="analysisCard" class="result-card">
         <h4 id="resultTitle">Результат анализа</h4>
         <img id="analysisPreview" src="" alt="Результат">
         <br>
         <a id="analysisDownload" class="download-link" href="#" download="analysis.jpg">Скачать результат (JPG)</a>
     </div>
-    <!-- Контейнер для дополнительных кнопок (3D модель) -->
     <div id="resultCards"></div>
 </div>
 
@@ -262,6 +261,8 @@ button:disabled {
     const toggleLogBtn = document.getElementById('toggleLogBtn');
     const resultDiv = document.getElementById('result');
     const resultCards = document.getElementById('resultCards');
+    const panoCard = document.getElementById('panoCard');
+    const analysisCard = document.getElementById('analysisCard');
     const panoPreview = document.getElementById('panoPreview');
     const panoDownload = document.getElementById('panoDownload');
     const analysisPreview = document.getElementById('analysisPreview');
@@ -350,8 +351,8 @@ button:disabled {
 
     // ---- Отправка с SSE ----
     uploadBtn.addEventListener('click', async () => {
-        if (selectedFiles.length < 2) {
-            alert('Загрузите минимум 2 изображения для сшивки панорамы');
+        if (selectedFiles.length < 1) {
+            alert('Загрузите хотя бы одно изображение');
             return;
         }
 
@@ -363,7 +364,6 @@ button:disabled {
         uploadBtn.disabled = true;
         loaderDiv.style.display = 'block';
         resultDiv.style.display = 'none';
-        // Очистка предыдущих кнопок (например, 3D модели)
         resultCards.innerHTML = '';
         progressFill.style.width = '0%';
         progressText.innerText = '0%';
@@ -402,17 +402,28 @@ button:disabled {
             });
 
             evtSource.addEventListener('result', (e) => {
-                const { panorama, annotated, model, model_name } = JSON.parse(e.data);
-                panoPreview.src = `data:image/jpeg;base64,${panorama}`;
-                panoDownload.href = `data:image/jpeg;base64,${panorama}`;
-                analysisPreview.src = `data:image/jpeg;base64,${annotated}`;
-                analysisDownload.href = `data:image/jpeg;base64,${annotated}`;
+                const data = JSON.parse(e.data);
+                const hasPanorama = data.has_panorama === true;
+                
+                // Панорама: показываем блок только если hasPanorama true и данные есть
+                if (hasPanorama && data.panorama) {
+                    panoCard.style.display = 'block';
+                    panoPreview.src = `data:image/jpeg;base64,${data.panorama}`;
+                    panoDownload.href = `data:image/jpeg;base64,${data.panorama}`;
+                } else {
+                    panoCard.style.display = 'none';
+                }
+                
+                // Результат анализа всегда показываем
+                analysisCard.style.display = 'block';
+                analysisPreview.src = `data:image/jpeg;base64,${data.annotated}`;
+                analysisDownload.href = `data:image/jpeg;base64,${data.annotated}`;
 
-                // Добавляем кнопку для 3D модели, если она пришла
-                if (model) {
+                // 3D модель, если есть
+                if (data.model) {
                     const modelLink = document.createElement('a');
-                    modelLink.href = `data:application/octet-stream;base64,${model}`;
-                    modelLink.download = model_name || 'model.obj';
+                    modelLink.href = `data:application/octet-stream;base64,${data.model}`;
+                    modelLink.download = data.model_name || 'model.obj';
                     modelLink.textContent = 'Скачать 3D модель (OBJ)';
                     modelLink.className = 'download-link';
                     resultCards.appendChild(modelLink);

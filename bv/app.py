@@ -14,9 +14,8 @@ from flask import Flask, render_template, request, jsonify, Response
 from ultralytics import YOLO
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 2000 * 1024 * 1024   # 2 ГБ
+app.config['MAX_CONTENT_LENGTH'] = 2000 * 1024 * 1024
 
-# Путь к модели и api
 MODEL_PATH = "C:/Users/user/Documents/GitHub/BC-2026/bv/best.pt"
 METASHAPE_EXE = r"C:\Program Files\Agisoft\Metashape Pro\metashape.exe"
 SCRIPT_METASHAPE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "metashape_stitch.py")
@@ -31,205 +30,165 @@ print("⏳ Загрузка YOLO...")
 model = YOLO(MODEL_PATH)
 print("✅ YOLO загружен")
 
-# Хранение задач
 jobs = {}
 jobs_lock = threading.Lock()
 
 # ------------------------------------------------------------
-# Функция детекции холодных зон (подземные воды, влажные участки)
-# ------------------------------------------------------------
 def detect_cold_zones(img_bgr):
-    """
-    Выделяет холодные зоны на термальных или обычных RGB-снимках.
-    Для карьера – ищем сине-голубые оттенки (вода/лёд).
-    Возвращает размеченное изображение и количество найденных зон.
-    """
     hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
-    # Диапазон синего/голубого в HSV (Hue ~ 80–120)
     lower_blue = np.array([80, 40, 40])
     upper_blue = np.array([120, 255, 255])
     mask = cv2.inRange(hsv, lower_blue, upper_blue)
-
-    # Морфологическая очистка от шума
     kernel = np.ones((5,5), np.uint8)
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-
-    # Поиск контуров
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     result = img_bgr.copy()
     cold_count = 0
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if area > 200:                     # отсекаем мелкие пятна
+        if area > 200:
             cold_count += 1
-            # Рисуем контур синим цветом
             cv2.drawContours(result, [cnt], -1, (255, 0, 0), 3)
-            # Подписываем «Cold zone»
             x, y, w, h = cv2.boundingRect(cnt)
             cv2.putText(result, "Cold zone (water?)", (x, y-5),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
     return result, cold_count
 
-# ------------------------------------------------------------
-# Вспомогательные функции
-# ------------------------------------------------------------
 def encode_image_to_base64(img_bgr, quality=98):
     _, buffer = cv2.imencode('.jpg', img_bgr, [cv2.IMWRITE_JPEG_QUALITY, quality])
     return base64.b64encode(buffer).decode('utf-8')
 
 def send_event(job_id, event_type, data):
-    prefix = f"[SSE:{job_id[:8]}][{event_type}]"
-    if event_type == 'log':
-        print(f"{prefix} {data}")
-    elif event_type == 'progress':
-        print(f"{prefix} Шаг {data['step']}/{data['total']} – {data['desc']}")
-    elif event_type == 'error':
-        print(f"{prefix} ❌ ОШИБКА: {data}")
-    elif event_type == 'result':
-        print(f"{prefix} Результат готов")
-    
     with jobs_lock:
         job = jobs.get(job_id)
         if job:
             job['queue'].put({'type': event_type, 'data': data})
 
 # ------------------------------------------------------------
-# Основная логика обработки
-# ------------------------------------------------------------
+def process_single_image_for_cracks(image_bytes, original_name):
+    img = cv2.imdecode(np.frombuffer(image_bytes, np.uint8), cv2.IMREAD_COLOR)
+    if img is None:
+        raise ValueError(f"Не удалось декодировать {original_name}")
+    results = model(img, conf=CONFIDENCE)
+    annotated = results[0].plot()
+    count = len(results[0].boxes) if results[0].boxes else 0
+    b64 = encode_image_to_base64(annotated)
+    return b64, count
+
 def process_images_thread(job_id, file_data, mode):
-    model_path = None
     try:
-        print(f"=== Старт задачи {job_id[:8]} ===")
-        send_event(job_id, 'log', 'Начало обработки')
-        send_event(job_id, 'progress', {'step': 0, 'total': 5, 'desc': 'Загрузка изображений'})
+        print(f"=== Старт задачи {job_id[:8]}, режим {mode}, файлов: {len(file_data)} ===")
+        send_event(job_id, 'log', f'Начало обработки, режим {mode}, файлов: {len(file_data)}')
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            input_folder = os.path.join(tmpdir, "input")
-            os.makedirs(input_folder, exist_ok=True)
-            print(f"DEBUG: Временная папка {input_folder} создана")
+        if mode == 'cracks':
+            if len(file_data) == 1:
+                send_event(job_id, 'log', 'Одно фото – анализ без сшивки')
+                send_event(job_id, 'progress', {'step': 0, 'total': 1, 'desc': 'Анализ YOLO'})
+                b64, count = process_single_image_for_cracks(file_data[0][1], file_data[0][0])
+                send_event(job_id, 'log', f'🔍 Обнаружено трещин: {count}')
+                result = {'panorama': b64, 'annotated': b64, 'has_panorama': False}
+                send_event(job_id, 'result', result)
+                return
 
-            image_paths = []
-            print(f"DEBUG: Начинаем сохранение {len(file_data)} файлов")
-            for i, (original_name, data) in enumerate(file_data):
-                dst_path = os.path.join(input_folder, f"img_{i:03d}.jpg")
-                print(f"DEBUG: сохраняю {original_name} -> {dst_path}")
-                try:
-                    img = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
+            send_event(job_id, 'progress', {'step': 0, 'total': 5, 'desc': 'Загрузка изображений'})
+            with tempfile.TemporaryDirectory() as tmpdir:
+                input_folder = os.path.join(tmpdir, "input")
+                os.makedirs(input_folder, exist_ok=True)
+                image_paths = []
+                for i, (original_name, data_bytes) in enumerate(file_data):
+                    dst_path = os.path.join(input_folder, f"img_{i:03d}.jpg")
+                    img = cv2.imdecode(np.frombuffer(data_bytes, np.uint8), cv2.IMREAD_COLOR)
                     if img is None:
                         raise ValueError(f"Не удалось декодировать {original_name}")
                     cv2.imwrite(dst_path, img, [cv2.IMWRITE_JPEG_QUALITY, 100])
                     image_paths.append(dst_path)
-                    print(f"DEBUG: сохранён {dst_path} ({img.shape[1]}x{img.shape[0]})")
-                    send_event(job_id, 'log', f'Сохранён {dst_path} ({img.shape[1]}x{img.shape[0]})')
-                except Exception as e:
-                    print(f"ОШИБКА сохранения {original_name}: {e}")
-                    send_event(job_id, 'error', f'Ошибка сохранения {original_name}: {str(e)}')
+                    send_event(job_id, 'log', f'Сохранён {original_name}')
+                send_event(job_id, 'log', f'📸 Всего сохранено: {len(image_paths)}')
+                send_event(job_id, 'progress', {'step': 1, 'total': 5, 'desc': 'Запуск Metashape'})
+
+                ortho_jpg = os.path.join(tmpdir, "orthophoto.jpg")
+                cmd = [METASHAPE_EXE, "-r", SCRIPT_METASHAPE, input_folder, ortho_jpg]
+                process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                           text=True, cwd=tmpdir)
+                for line in process.stdout:
+                    line = line.strip()
+                    if line:
+                        print(f"[Metashape] {line}")
+                        send_event(job_id, 'log', f'[Metashape] {line}')
+                        if "Aligning" in line:
+                            send_event(job_id, 'progress', {'step': 1, 'total': 4, 'desc': 'Выравнивание...'})
+                        elif "Building model" in line:
+                            send_event(job_id, 'progress', {'step': 2, 'total': 4, 'desc': 'Построение модели...'})
+                        elif "Orthomosaic" in line:
+                            send_event(job_id, 'progress', {'step': 3, 'total': 4, 'desc': 'Ортомозаика...'})
+                        elif "Exporting" in line:
+                            send_event(job_id, 'progress', {'step': 4, 'total': 4, 'desc': 'Экспорт...'})
+                rc = process.wait()
+                if rc != 0 or not os.path.exists(ortho_jpg):
+                    send_event(job_id, 'error', f'Metashape ошибка (код {rc})')
                     return
 
-            if len(image_paths) < 2:
-                send_event(job_id, 'error', 'Недостаточно изображений (минимум 2)')
-                return
+                send_event(job_id, 'log', '✅ Metashape успешен')
+                send_event(job_id, 'progress', {'step': 5, 'total': 5, 'desc': 'YOLO анализ'})
 
-            print(f"DEBUG: Всего сохранено {len(image_paths)} изображений")
-            send_event(job_id, 'log', f'📸 Всего сохранено: {len(image_paths)}')
-            send_event(job_id, 'progress', {'step': 1, 'total': 5, 'desc': 'Запуск Metashape'})
+                pano = cv2.imread(ortho_jpg)
+                if pano is None:
+                    send_event(job_id, 'error', 'Не удалось прочитать ортофотоплан')
+                    return
 
-            # Запуск Metashape
-            ortho_jpg = os.path.join(tmpdir, "orthophoto.jpg")
-            cmd = [METASHAPE_EXE, "-r", SCRIPT_METASHAPE, input_folder, ortho_jpg]
-            print(f"Запуск Metashape: {' '.join(cmd)}")
-            send_event(job_id, 'log', f'Запуск Metashape: {" ".join(cmd)}')
-
-            process = subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                cwd=tmpdir
-            )
-
-            for line in process.stdout:
-                line = line.strip()
-                if line:
-                    print(f"[Metashape] {line}")
-                    send_event(job_id, 'log', f'[Metashape] {line}')
-                    if "1/4 Aligning..." in line:
-                        send_event(job_id, 'progress', {'step': 1, 'total': 4, 'desc': 'Выравнивание...'})
-                    elif "2/4 Building" in line:
-                        send_event(job_id, 'progress', {'step': 2, 'total': 4, 'desc': 'Построение глубины и модели...'})
-                    elif "EXPORT_MODEL_START" in line:
-                        send_event(job_id, 'log', 'Экспорт 3D модели...')
-                    elif "EXPORT_MODEL:" in line:
-                        model_path = line.split(":", 1)[1].strip()
-                        print(f"DEBUG: 3D модель экспортирована: {model_path}")
-                        send_event(job_id, 'log', f'3D модель экспортирована: {os.path.basename(model_path)}')
-                    elif "3/4 Orthomosaic..." in line:
-                        send_event(job_id, 'progress', {'step': 3, 'total': 4, 'desc': 'Ортомозаика...'})
-                    elif "4/4 Exporting..." in line:
-                        send_event(job_id, 'progress', {'step': 4, 'total': 4, 'desc': 'Экспорт...'})
-
-            process.wait()
-            rc = process.returncode
-            print(f"Metashape завершился с кодом {rc}")
-            if rc != 0 or not os.path.exists(ortho_jpg):
-                send_event(job_id, 'error', f'Metashape завершился с ошибкой (код {rc})')
-                return
-
-            send_event(job_id, 'log', '✅ Metashape успешно завершён')
-            send_event(job_id, 'progress', {'step': 5, 'total': 5, 'desc': 'Анализ изображения'})
-
-            # --- Чтение ортофото и анализ в зависимости от режима ---
-            pano = cv2.imread(ortho_jpg)
-            if pano is None:
-                send_event(job_id, 'error', 'Не удалось загрузить ортофотоплан')
-                return
-
-            if mode == 'cracks':
-                print("Запуск YOLO анализа...")
-                send_event(job_id, 'log', 'Поиск трещин (YOLO)...')
                 results = model(pano, conf=CONFIDENCE)
                 annotated = results[0].plot()
                 count = len(results[0].boxes) if results[0].boxes else 0
-                print(f"Обнаружено трещин: {count}")
-                send_event(job_id, 'log', f'Обнаружено трещин: {count}')
-            else:  # mode == 'thermal' (Аномальные зоны)
-                print("Режим thermal: поиск холодных зон (подземные воды)...")
-                send_event(job_id, 'log', 'Поиск холодных зон (сине-голубые участки)...')
-                annotated, cold_count = detect_cold_zones(pano)
-                send_event(job_id, 'log', f'❄️ Найдено холодных зон: {cold_count}')
+                send_event(job_id, 'log', f'🔍 Обнаружено трещин: {count}')
 
-            pano_b64 = encode_image_to_base64(pano)
-            annotated_b64 = encode_image_to_base64(annotated)
-            result = {'panorama': pano_b64, 'annotated': annotated_b64}
+                pano_b64 = encode_image_to_base64(pano)
+                annotated_b64 = encode_image_to_base64(annotated)
+                result = {'panorama': pano_b64, 'annotated': annotated_b64, 'has_panorama': True}
+                send_event(job_id, 'result', result)
 
-            # 3D модель (если есть)
-            if model_path and os.path.exists(model_path):
-                try:
-                    with open(model_path, "rb") as f:
-                        model_data = f.read()
-                    model_b64 = base64.b64encode(model_data).decode('utf-8')
-                    result['model'] = model_b64
-                    result['model_name'] = os.path.basename(model_path)
-                    send_event(job_id, 'log', '3D модель добавлена в результат')
-                except Exception as e:
-                    print(f"Ошибка при добавлении модели: {e}")
+        else:  # mode == 'thermal'
+            send_event(job_id, 'log', 'Режим тепловых аномалий: обработка каждого кадра')
+            all_annotated = []
+            total = len(file_data)
+            if total == 0:
+                send_event(job_id, 'error', 'Нет загруженных изображений')
+                return
 
+            for idx, (original_name, data_bytes) in enumerate(file_data):
+                img = cv2.imdecode(np.frombuffer(data_bytes, np.uint8), cv2.IMREAD_COLOR)
+                if img is None:
+                    send_event(job_id, 'log', f'⚠️ Не удалось декодировать {original_name}, пропускаем')
+                    continue
+                annotated, cold_count = detect_cold_zones(img)
+                b64 = encode_image_to_base64(annotated)
+                all_annotated.append(b64)
+                send_event(job_id, 'log', f'Обработан {original_name} (холодных зон: {cold_count})')
+                send_event(job_id, 'progress', {'step': idx+1, 'total': total, 'desc': f'Обработка {idx+1}/{total}'})
+
+            if not all_annotated:
+                send_event(job_id, 'error', 'Не удалось обработать ни одного изображения')
+                return
+
+            first_b64 = all_annotated[0]
+            result = {
+                'panorama': first_b64,
+                'annotated': first_b64,
+                'all_annotated': all_annotated,
+                'has_panorama': False
+            }
+            send_event(job_id, 'log', f'✅ Обработано {len(all_annotated)} изображений')
             send_event(job_id, 'result', result)
-            send_event(job_id, 'log', 'Обработка завершена')
-            print(f"=== Задача {job_id[:8]} успешно завершена ===")
 
     except Exception as e:
         tb = traceback.format_exc()
-        print(f"КРИТИЧЕСКАЯ ОШИБКА в задаче {job_id[:8]}: {e}\n{tb}")
-        send_event(job_id, 'error', f'{str(e)}\n{tb}')
+        print(f"КРИТИЧЕСКАЯ ОШИБКА: {e}\n{tb}")
+        send_event(job_id, 'error', str(e))
     finally:
         with jobs_lock:
             if job_id in jobs:
-                jobs[job_id]['status'] = 'done' if 'result' in locals() else 'error'
+                jobs[job_id]['status'] = 'done'
 
-# ------------------------------------------------------------
-# Flask маршруты
 # ------------------------------------------------------------
 @app.route('/')
 def index():
@@ -250,33 +209,19 @@ def author():
 @app.route('/process', methods=['POST'])
 def start_process():
     files = request.files.getlist('images')
-    print(f"Получен запрос: {len(files)} файлов")
-    if len(files) < 2:
-        print("Ошибка: недостаточно файлов")
-        return jsonify({'error': 'Минимум 2 изображения'}), 400
-
     mode = request.form.get('mode', 'cracks')
-    print(f"Режим: {mode}")
+    print(f"📥 Получен запрос: {len(files)} файлов, режим {mode}")
 
-    file_data = []
-    for f in files:
-        f.stream.seek(0)
-        data = f.read()
-        file_data.append((f.filename, data))
-        print(f"Прочитан файл: {f.filename}, размер {len(data)} байт")
+    if len(files) == 0:
+        return jsonify({'error': 'Загрузите хотя бы одно изображение'}), 400
 
+    file_data = [(f.filename, f.read()) for f in files]
     job_id = str(uuid.uuid4())
     q = queue.Queue()
     with jobs_lock:
         jobs[job_id] = {'queue': q, 'status': 'processing'}
-
-    thread = threading.Thread(
-        target=process_images_thread,
-        args=(job_id, file_data, mode),
-        daemon=True
-    )
+    thread = threading.Thread(target=process_images_thread, args=(job_id, file_data, mode), daemon=True)
     thread.start()
-    print(f"Задача запущена, job_id = {job_id[:8]}")
     return jsonify({'job_id': job_id})
 
 @app.route('/stream/<job_id>')
@@ -287,7 +232,6 @@ def stream(job_id):
         if not job:
             yield f"data: {json.dumps({'type': 'error', 'data': 'Неверный job_id'})}\n\n"
             return
-
         q = job['queue']
         while True:
             try:
@@ -303,7 +247,6 @@ def stream(job_id):
                 if status != 'processing':
                     break
                 yield ": heartbeat\n\n"
-
     return Response(event_stream(), mimetype="text/event-stream")
 
 if __name__ == '__main__':
