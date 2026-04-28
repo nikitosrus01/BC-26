@@ -35,7 +35,45 @@ print("✅ YOLO загружен")
 jobs = {}
 jobs_lock = threading.Lock()
 
-#Вспомогательные функции
+# ------------------------------------------------------------
+# Функция детекции холодных зон (подземные воды, влажные участки)
+# ------------------------------------------------------------
+def detect_cold_zones(img_bgr):
+    """
+    Выделяет холодные зоны на термальных или обычных RGB-снимках.
+    Для карьера – ищем сине-голубые оттенки (вода/лёд).
+    Возвращает размеченное изображение и количество найденных зон.
+    """
+    hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
+    # Диапазон синего/голубого в HSV (Hue ~ 80–120)
+    lower_blue = np.array([80, 40, 40])
+    upper_blue = np.array([120, 255, 255])
+    mask = cv2.inRange(hsv, lower_blue, upper_blue)
+
+    # Морфологическая очистка от шума
+    kernel = np.ones((5,5), np.uint8)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+
+    # Поиск контуров
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    result = img_bgr.copy()
+    cold_count = 0
+    for cnt in contours:
+        area = cv2.contourArea(cnt)
+        if area > 200:                     # отсекаем мелкие пятна
+            cold_count += 1
+            # Рисуем контур синим цветом
+            cv2.drawContours(result, [cnt], -1, (255, 0, 0), 3)
+            # Подписываем «Cold zone»
+            x, y, w, h = cv2.boundingRect(cnt)
+            cv2.putText(result, "Cold zone (water?)", (x, y-5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+    return result, cold_count
+
+# ------------------------------------------------------------
+# Вспомогательные функции
+# ------------------------------------------------------------
 def encode_image_to_base64(img_bgr, quality=98):
     _, buffer = cv2.imencode('.jpg', img_bgr, [cv2.IMWRITE_JPEG_QUALITY, quality])
     return base64.b64encode(buffer).decode('utf-8')
@@ -56,9 +94,11 @@ def send_event(job_id, event_type, data):
         if job:
             job['queue'].put({'type': event_type, 'data': data})
 
-# Основная логика
+# ------------------------------------------------------------
+# Основная логика обработки
+# ------------------------------------------------------------
 def process_images_thread(job_id, file_data, mode):
-    model_path = None   # путь к экспортированной 3D-модели
+    model_path = None
     try:
         print(f"=== Старт задачи {job_id[:8]} ===")
         send_event(job_id, 'log', 'Начало обработки')
@@ -109,7 +149,6 @@ def process_images_thread(job_id, file_data, mode):
                 cwd=tmpdir
             )
 
-            # Читаем вывод и ищем путь к модели
             for line in process.stdout:
                 line = line.strip()
                 if line:
@@ -138,9 +177,9 @@ def process_images_thread(job_id, file_data, mode):
                 return
 
             send_event(job_id, 'log', '✅ Metashape успешно завершён')
-            send_event(job_id, 'progress', {'step': 5, 'total': 5, 'desc': 'YOLO анализ'})
+            send_event(job_id, 'progress', {'step': 5, 'total': 5, 'desc': 'Анализ изображения'})
 
-            # --- Чтение ортофото и анализ ---
+            # --- Чтение ортофото и анализ в зависимости от режима ---
             pano = cv2.imread(ortho_jpg)
             if pano is None:
                 send_event(job_id, 'error', 'Не удалось загрузить ортофотоплан')
@@ -154,16 +193,17 @@ def process_images_thread(job_id, file_data, mode):
                 count = len(results[0].boxes) if results[0].boxes else 0
                 print(f"Обнаружено трещин: {count}")
                 send_event(job_id, 'log', f'Обнаружено трещин: {count}')
-            else:
-                print("Режим thermal: отдаём панораму без анализа")
-                send_event(job_id, 'log', 'Режим тепловизора – отдаём панораму')
-                annotated = pano.copy()
+            else:  # mode == 'thermal' (Аномальные зоны)
+                print("Режим thermal: поиск холодных зон (подземные воды)...")
+                send_event(job_id, 'log', 'Поиск холодных зон (сине-голубые участки)...')
+                annotated, cold_count = detect_cold_zones(pano)
+                send_event(job_id, 'log', f'❄️ Найдено холодных зон: {cold_count}')
 
             pano_b64 = encode_image_to_base64(pano)
             annotated_b64 = encode_image_to_base64(annotated)
             result = {'panorama': pano_b64, 'annotated': annotated_b64}
 
-            # --- 3D модель (если есть) ---
+            # 3D модель (если есть)
             if model_path and os.path.exists(model_path):
                 try:
                     with open(model_path, "rb") as f:
@@ -189,7 +229,7 @@ def process_images_thread(job_id, file_data, mode):
                 jobs[job_id]['status'] = 'done' if 'result' in locals() else 'error'
 
 # ------------------------------------------------------------
-# МАРШРУТЫ
+# Flask маршруты
 # ------------------------------------------------------------
 @app.route('/')
 def index():
@@ -267,5 +307,5 @@ def stream(job_id):
     return Response(event_stream(), mimetype="text/event-stream")
 
 if __name__ == '__main__':
-    print("Сервер запущен на http://0.0.0.0:5000")
+    print("🔥 Сервер запущен на http://0.0.0.0:5000")
     app.run(host='0.0.0.0', port=5000, debug=False)
