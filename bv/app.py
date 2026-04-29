@@ -36,23 +36,37 @@ jobs_lock = threading.Lock()
 # ------------------------------------------------------------
 def detect_cold_zones(img_bgr):
     hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
-    lower_blue = np.array([80, 40, 40])
-    upper_blue = np.array([120, 255, 255])
-    mask = cv2.inRange(hsv, lower_blue, upper_blue)
+    
+    lower_blue = np.array([80, 25, 25])
+    upper_blue = np.array([130, 255, 255])
+    mask_blue = cv2.inRange(hsv, lower_blue, upper_blue)
+    
+    lower_cyan = np.array([70, 30, 80])
+    upper_cyan = np.array([90, 255, 255])
+    mask_cyan = cv2.inRange(hsv, lower_cyan, upper_cyan)
+    
+    lower_light = np.array([85, 10, 150])
+    upper_light = np.array([120, 100, 255])
+    mask_light = cv2.inRange(hsv, lower_light, upper_light)
+    
+    mask = cv2.bitwise_or(mask_blue, mask_cyan)
+    mask = cv2.bitwise_or(mask, mask_light)
+    
     kernel = np.ones((5,5), np.uint8)
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     result = img_bgr.copy()
     cold_count = 0
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if area > 200:
+        if area > 150:   
             cold_count += 1
-            cv2.drawContours(result, [cnt], -1, (255, 0, 0), 3)
+            cv2.drawContours(result, [cnt], -1, (0, 0, 255), 3)
             x, y, w, h = cv2.boundingRect(cnt)
-            cv2.putText(result, "Cold zone (water?)", (x, y-5),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+            cv2.putText(result, "Cold zone", (x, y-5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 4)
     return result, cold_count
 
 def encode_image_to_base64(img_bgr, quality=98):
