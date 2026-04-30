@@ -26,9 +26,9 @@ if not os.path.exists(METASHAPE_EXE):
 
 print("✅ Metashape:", METASHAPE_EXE)
 print("✅ Скрипт:", SCRIPT_METASHAPE)
-print("⏳ Загрузка YOLO...")
+print("Загрузка YOLO...")
 model = YOLO(MODEL_PATH)
-print("✅ YOLO загружен")
+print("YOLO загружен")
 
 jobs = {}
 jobs_lock = threading.Lock()
