@@ -21,10 +21,10 @@
 
 <br>
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-2.0+-green.svg)](https://flask.palletsprojects.com/)
 [![Agisoft Metashape](https://img.shields.io/badge/Metashape-2.2.2-orange.svg)](https://www.agisoft.com/)
-[![Ultralytics YOLO](https://img.shields.io/badge/YOLOv8-yellow.svg)](https://ultralytics.com/)
+[![Ultralytics YOLO](https://img.shields.io/badge/YOLO26-yellow.svg)](https://ultralytics.com/)
 
 </div>
 
