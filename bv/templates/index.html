@@ -228,7 +228,6 @@ button:disabled {
 </div>
 
 <script>
-    // ---- Переключение режимов ----
     const modeRadios = document.querySelectorAll('input[name="mode"]');
     const modeCracksLabel = document.getElementById('modeCracksLabel');
     const modeThermalLabel = document.getElementById('modeThermalLabel');
@@ -248,7 +247,6 @@ button:disabled {
     modeRadios.forEach(radio => radio.addEventListener('change', updateModeUI));
     updateModeUI();
 
-    // ---- Drag & drop и отправка ----
     const dropzone = document.getElementById('dropzone');
     const fileInput = document.getElementById('fileInput');
     const fileInfo = document.getElementById('fileInfo');
@@ -338,7 +336,6 @@ button:disabled {
     });
     dropzone.addEventListener('click', () => fileInput.click());
 
-    // Кнопка показа/скрытия логов
     toggleLogBtn.addEventListener('click', () => {
         if (logBox.style.display === 'block') {
             logBox.style.display = 'none';
@@ -349,7 +346,6 @@ button:disabled {
         }
     });
 
-    // ---- Отправка с SSE ----
     uploadBtn.addEventListener('click', async () => {
         if (selectedFiles.length < 1) {
             alert('Загрузите хотя бы одно изображение');
@@ -405,7 +401,6 @@ button:disabled {
                 const data = JSON.parse(e.data);
                 const hasPanorama = data.has_panorama === true;
                 
-                // Панорама: показываем блок только если hasPanorama true и данные есть
                 if (hasPanorama && data.panorama) {
                     panoCard.style.display = 'block';
                     panoPreview.src = `data:image/jpeg;base64,${data.panorama}`;
@@ -414,12 +409,10 @@ button:disabled {
                     panoCard.style.display = 'none';
                 }
                 
-                // Результат анализа всегда показываем
                 analysisCard.style.display = 'block';
                 analysisPreview.src = `data:image/jpeg;base64,${data.annotated}`;
                 analysisDownload.href = `data:image/jpeg;base64,${data.annotated}`;
 
-                // 3D модель, если есть
                 if (data.model) {
                     const modelLink = document.createElement('a');
                     modelLink.href = `data:application/octet-stream;base64,${data.model}`;
