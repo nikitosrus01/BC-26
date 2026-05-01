@@ -264,5 +264,5 @@ def stream(job_id):
     return Response(event_stream(), mimetype="text/event-stream")
 
 if __name__ == '__main__':
-    print("🔥 Сервер запущен на http://0.0.0.0:5000")
+    print("Сервер запущен на http://0.0.0.0:5000")
     app.run(host='0.0.0.0', port=5000, debug=False)
