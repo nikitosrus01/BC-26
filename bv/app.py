@@ -22,10 +22,10 @@ SCRIPT_METASHAPE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "met
 CONFIDENCE = 0.25
 
 if not os.path.exists(METASHAPE_EXE):
-    raise RuntimeError(f"❌ Metashape.exe не найден: {METASHAPE_EXE}")
+    raise RuntimeError(f"Metashape.exe не найден: {METASHAPE_EXE}")
 
-print("✅ Metashape:", METASHAPE_EXE)
-print("✅ Скрипт:", SCRIPT_METASHAPE)
+print("Metashape:", METASHAPE_EXE)
+print("Скрипт:", SCRIPT_METASHAPE)
 print("Загрузка YOLO...")
 model = YOLO(MODEL_PATH)
 print("YOLO загружен")
@@ -143,7 +143,7 @@ def process_images_thread(job_id, file_data, mode):
                     send_event(job_id, 'error', f'Metashape ошибка (код {rc})')
                     return
 
-                send_event(job_id, 'log', '✅ Metashape успешен')
+                send_event(job_id, 'log', 'Metashape успешен')
                 send_event(job_id, 'progress', {'step': 5, 'total': 5, 'desc': 'YOLO анализ'})
 
                 pano = cv2.imread(ortho_jpg)
@@ -172,7 +172,7 @@ def process_images_thread(job_id, file_data, mode):
             for idx, (original_name, data_bytes) in enumerate(file_data):
                 img = cv2.imdecode(np.frombuffer(data_bytes, np.uint8), cv2.IMREAD_COLOR)
                 if img is None:
-                    send_event(job_id, 'log', f'⚠️ Не удалось декодировать {original_name}, пропускаем')
+                    send_event(job_id, 'log', f'Не удалось декодировать {original_name}, пропускаем')
                     continue
                 annotated, cold_count = detect_cold_zones(img)
                 b64 = encode_image_to_base64(annotated)
@@ -191,7 +191,7 @@ def process_images_thread(job_id, file_data, mode):
                 'all_annotated': all_annotated,
                 'has_panorama': False
             }
-            send_event(job_id, 'log', f'✅ Обработано {len(all_annotated)} изображений')
+            send_event(job_id, 'log', f'Обработано {len(all_annotated)} изображений')
             send_event(job_id, 'result', result)
 
     except Exception as e:
